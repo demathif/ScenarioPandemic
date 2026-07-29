@@ -1,36 +1,44 @@
-/** Fonction principale, affiche les personnages: checkbox + image */
+/** Fonction principale, affiche les personnages en grille de cartes modernes */
 function run () {
 	var myForm = document.getElementById("idBoxes");
-	var table = document.createElement("TABLE");
-	var row_number = 0;
+	var grid = document.createElement("div");
+	grid.className = "character-grid";
 
 	for (var i = 0; i < roles.length; i++) {
+		var card = document.createElement("div");
+		card.className = "character-card";
 
-		if ( i % 5 == 0 ) {
-			var row = document.createElement("tr");
-			table.appendChild(row);
-		}
-		var cell = document.createElement("td");
-		cell.style.border = "solid #E9967A";
-		row.appendChild(cell);
 		var checkBox = document.createElement("input");
-		var label = document.createElement("label");
-		var img = document.createElement("img");
-		var br = document.createElement("BR");
 		checkBox.type = "checkbox";
 		checkBox.value = roles[i];
-		checkBox.id = "id"+i;
-		cell.appendChild(checkBox);
-		cell.appendChild(label);
-		label.appendChild(document.createTextNode(roles[i]));
-		label.htmlFor = "id"+i;
-		img.src = './../images/' + encodeURI(roles[i]) + '.png';
-		img.width = "200";
-		img.height = "260";
-		label.appendChild(br);
+		checkBox.id = "id" + i;
+		checkBox.className = "character-checkbox";
+
+		var label = document.createElement("label");
+		label.className = "character-label";
+		label.htmlFor = "id" + i;
+
+		var img = document.createElement("img");
+		img.src = "./../images/" + encodeURI(roles[i]) + ".png";
+		img.alt = roles[i];
+		img.loading = "lazy";
+
+		var nameSpan = document.createElement("span");
+		nameSpan.className = "character-name";
+		nameSpan.textContent = roles[i];
+
+		var selectedBadge = document.createElement("span");
+		selectedBadge.className = "character-selected-badge";
+		selectedBadge.textContent = "✓";
+
 		label.appendChild(img);
+		label.appendChild(nameSpan);
+		card.appendChild(checkBox);
+		card.appendChild(label);
+		card.appendChild(selectedBadge);
+		grid.appendChild(card);
 	}
-	myForm.appendChild(table);
+	myForm.appendChild(grid);
 }
 
 /** onclick, on recupere les roles du form sinon on les choisit aléatoirement */
@@ -38,18 +46,17 @@ function get_roles (form) {
 	var count = 0;
 	var choice = [];
 	var limit = 2; // FIXME: what if more that 2 players
-	var random_roles = ""
+	var random_roles = "";
 
-	for (var i = 0; i < form.elements.length; i++ ) {
-		if (form.elements[i].type == 'checkbox') {
-			if ( form.elements[i].checked ) {
-				if (count < limit) {
-					choice[count]=form.elements[i].value;
-					count++;
-				} else if (count >= limit) {
-					alert("Vous ne pouvez pas choisir plus de "+limit+" personnages");
-					return;
-				}
+	var checkboxes = form.querySelectorAll('input[type="checkbox"]');
+	for (var i = 0; i < checkboxes.length; i++) {
+		if (checkboxes[i].checked) {
+			if (count < limit) {
+				choice[count] = checkboxes[i].value;
+				count++;
+			} else if (count >= limit) {
+				alert("Vous ne pouvez pas choisir plus de " + limit + " personnages");
+				return;
 			}
 		}
 	}
@@ -59,7 +66,6 @@ function get_roles (form) {
 		for (var k = 0; k < limit; k++) {
 			roles_copy = roles_copy.filter(function(e) { return e !== choice[k]; });
 		}
-		// Ask Ben to shuffle
 		shuffle(roles_copy);
 		for (var j = 0; j < limit - count; j++) {
 			choice[limit - j - 1] = roles_copy[j];
@@ -67,7 +73,7 @@ function get_roles (form) {
 		}
 	}
 	if (random_roles) {
-		alert("Les roles suivants ont été choisis aléatoirement:\n"+random_roles);
+		alert("Les roles suivants ont été choisis aléatoirement:\n" + random_roles);
 	}
 
 	shuffle(choice);

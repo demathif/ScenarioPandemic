@@ -12,14 +12,25 @@
 	
 	<body onload="run();">
 		<header>
-			Bienvenue à Scénario Pandemic, scénario aléatoire du type demi-finales du championnat du monde
+			🎲 Scénario Pandemic — Sélection des personnages
 		</header>
 
 		<div class="section-action">
-			<p>Choisissez 0, 1 ou 2 personnages :</p>
+			<p style="text-align:center; font-size:var(--font-size-lg);">
+				Choisissez <strong>0, 1 ou 2 personnages</strong>, puis cliquez sur <strong>Start</strong>.
+				<br/>
+				<span style="font-size:var(--font-size-sm); color:var(--color-text-light);">
+					Les personnages non choisis seront attribués aléatoirement.
+				</span>
+			</p>
 			<form id="idBoxes" name="thisForm">
-				<button type="button" onclick="get_roles(document.thisForm);" class="primary">Start</button>
+				<!-- La grille des personnages est générée ici par prepare.js -->
 			</form>
+			<div style="text-align:center; margin-top:var(--spacing-lg);">
+				<button type="button" onclick="get_roles(document.thisForm);" class="primary" style="font-size:var(--font-size-lg); padding:var(--spacing-md) var(--spacing-xl);">
+					🎮 Start
+				</button>
+			</div>
 		</div>
 
 		<div class="section-action">
