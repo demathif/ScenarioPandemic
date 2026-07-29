@@ -21,6 +21,7 @@ function run () {
 		var img = document.createElement("img");
 		img.src = "./../images/" + encodeURI(roles[i]) + ".png";
 		img.alt = roles[i];
+		img.title = descriptionsRole[roles[i]] || roles[i];
 		img.loading = "lazy";
 
 		var nameSpan = document.createElement("span");

@@ -64,7 +64,7 @@ function miseEnPlaceJoueur(idJoueur) {
 			'<span class="player-pawn" style="background-color:' + pionColor + ';">' +
 				'J' + numJoueur +
 			'</span>' +
-			'<img src="../images/' + encodeURI(role) + '.png" width="100" height="130" class="zoomA" alt="' + role + '">' +
+			'<img src="../images/' + encodeURI(role) + '.png" width="100" height="130" class="zoomA" alt="' + role + '" title="' + (descriptionsRole[role] || role) + '">' +
 		'</div>';
 }
 
