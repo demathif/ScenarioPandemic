@@ -12,6 +12,9 @@ var lienSansPseudo = "";
 // Permet de bien compter le nombre de tour
 var isChronoDejaTourne = false;
 
+/** Mapping rôle → numéro de joueur (1 ou 2) */
+var joueurDuRole = {};
+
 /** Retourne la couleur de la carte */
 function getCouleur(carte){
 	if(bleu.indexOf(carte) >= 0) {
@@ -36,17 +39,28 @@ function getCouleur(carte){
 /** Permet de retirer les 4 premières cartes du paquet joueur
 	ainsi que les roles des 2 joueurs */
 function miseEnPlaceJoueur(idJoueur) {
-	var cartes = "<ul>";
+	var cartesHtml = "";
 	var carte = "";
 	var role = rolesShuffle.shift();
 	for (var i = 0; i <= 3; i++) {
 		carte = paquetJoueur.shift();
-		cartes += "<li><span class='carte-color' data-color='" + getCouleur(carte) + "'>" + carte + "</span></li>";
+		cartesHtml += "<span class='carte-joueur-item'><span class='carte-color' data-color='" + getCouleur(carte) + "'>" + carte + "</span></span>";
 	}
-	cartes += "</ul>";
-	document.getElementById(idJoueur).innerHTML = cartes;
+	document.getElementById(idJoueur + 'Cartes').innerHTML = cartesHtml;
 	document.getElementById(idJoueur + 'Role').innerHTML = role;
-	document.getElementById(idJoueur + 'Image').innerHTML = '<img src="../images/' + encodeURI(role) + '.png" width="100" height="130" class="zoomA" alt="' + role + '">';
+
+	// Couleur du pion
+	var numJoueur = idJoueur === 'idJoueur1' ? 1 : 2;
+	joueurDuRole[role] = numJoueur;
+	var pionColor = couleurPion[role] || '#7f8c8d';
+
+	document.getElementById(idJoueur + 'Image').innerHTML =
+		'<div class="player-card-image-wrapper">' +
+			'<span class="player-pawn" style="background-color:' + pionColor + ';">' +
+				'J' + numJoueur +
+			'</span>' +
+			'<img src="../images/' + encodeURI(role) + '.png" width="100" height="130" class="zoomA" alt="' + role + '">' +
+		'</div>';
 }
 
 
@@ -363,8 +377,20 @@ function tournePropogation(){
 		document.getElementById('idOneClick').innerHTML = document.getElementById('idButtonCarte1').innerHTML;
 		document.getElementById('idGoJoueur').innerHTML = "Tour : " + document.getElementById('idJoueur' + joueur + 'Role').innerHTML;
 		document.getElementById('idGoJoueur').className = "goJoueur";
+		surlignerJoueur(joueur);
 	}
 	isPseudoGagnePerduCeTour("P");
+}
+
+
+/** Met en surbrillance le joueur actif et grise l'autre */
+function surlignerJoueur(numJoueur) {
+	var joueur1 = document.getElementById('idJoueur1');
+	var joueur2 = document.getElementById('idJoueur2');
+	if (joueur1 && joueur2) {
+		joueur1.classList.toggle('joueur-actif', numJoueur === 1);
+		joueur2.classList.toggle('joueur-actif', numJoueur === 2);
+	}
 }
 
 

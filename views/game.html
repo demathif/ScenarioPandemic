@@ -12,23 +12,27 @@
 	
 	<body onload="run();">
 		<header>
-			Bienvenue à Scénario Pandemic, scénario aléatoire du type finales du championnat du monde
+			🎲 Scénario Pandemic
 		</header>
 
-		<a id="idLienCartesJoueurs" class="lien-cartes" onclick="cacherAfficherCartes('idCartesJoueurs', 'idLienCartesJoueurs')" href="javascript:void(0);">Cacher</a>
-
-		<div id="idCartesJoueurs">
-			<span class="joueur">
-				<strong>Joueur 1 : <span id="idJoueur1Role"></span></strong>
-				<span id="idJoueur1Image"></span>
-				<span id="idJoueur1"></span>
-			</span>
+		<div id="idCartesJoueurs" class="players-row">
+			<div id="idJoueur1" class="joueur">
+				<div class="joueur-header">
+					<span class="joueur-titre">Joueur 1</span>
+					<span class="joueur-role" id="idJoueur1Role"></span>
+				</div>
+				<div id="idJoueur1Image" class="joueur-image"></div>
+				<div class="joueur-cartes" id="idJoueur1Cartes"></div>
+			</div>
 			
-			<span class="joueur">
-				<strong>Joueur 2 : <span id="idJoueur2Role"></span></strong>
-				<span id="idJoueur2Image"></span>
-				<span id="idJoueur2"></span>
-			</span>
+			<div id="idJoueur2" class="joueur">
+				<div class="joueur-header">
+					<span class="joueur-titre">Joueur 2</span>
+					<span class="joueur-role" id="idJoueur2Role"></span>
+				</div>
+				<div id="idJoueur2Image" class="joueur-image"></div>
+				<div class="joueur-cartes" id="idJoueur2Cartes"></div>
+			</div>
 		</div>
 
 		<div class="boutons-ligne">
