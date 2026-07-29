@@ -35,6 +35,25 @@
 			</div>
 		</div>
 
+		<!-- Panneau de propagation -->
+		<div class="propagation-panel" id="idPropagationPanel">
+			<div class="propagation-header">
+				<span class="propagation-title">🦠 Propagation</span>
+				<span class="propagation-stats">
+					Épidémies : <strong id="idNbEpidemies">0</strong>
+					&nbsp;|&nbsp;
+					Cartes à tirer : <strong id="idCartesATirer">-</strong>
+				</span>
+			</div>
+			<div class="propagation-cartes" id="idPropagationCartes">
+				<div class="propagation-empty">En attente de tirage...</div>
+			</div>
+			<div class="propagation-epidemies" id="idPropagationEpidemies" style="display:none;">
+				<div class="propagation-subheader">💀 Épidémies</div>
+				<div class="propagation-cartes" id="idEpidemiesCartes"></div>
+			</div>
+		</div>
+
 		<div class="boutons-ligne">
 			<button id="idButtonCarte1" onclick="tirerCartes('idCarte1')" disabled>Tirer 1<sup>ère</sup> carte</button>
 			<button id="idButtonCarte2" onclick="tirerCartes('idCarte2')" style="display: none;">Tirer 2<sup>nde</sup> carte</button>

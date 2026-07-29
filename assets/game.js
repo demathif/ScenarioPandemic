@@ -15,6 +15,11 @@ var isChronoDejaTourne = false;
 /** Mapping rôle → numéro de joueur (1 ou 2) */
 var joueurDuRole = {};
 
+/** Suivi des propagations */
+var nbEpidemiesTombees = 0;
+var cubesParVille = {};
+var cartesPropagationTirees = [];
+
 /** Retourne la couleur de la carte */
 function getCouleur(carte){
 	if(bleu.indexOf(carte) >= 0) {
@@ -180,6 +185,9 @@ function run () {
 	// On écrit toutes les cartes au cas où
 	document.getElementById('idSpoilPaquetJoueur').innerHTML = paquetJoueur.join("<br />");
 	document.getElementById('idSpoilPaquetPropagation').innerHTML = paquetPropagationEntier.join("<br />");
+
+	// Initialisation du panneau propagation
+	initialiserPanelPropagation();
 }
 
 
@@ -352,6 +360,104 @@ function isPseudoGagnePerduCeTour(typeCarte) {
 }
 
 
+/** Retourne le nombre de cubes à ajouter selon la position dans les 9 initiales */
+function getNbCubesPourCarte(carteStr, indexGlobal) {
+	if (carteStr.indexOf("Epidemie") >= 0) {
+		return 0;
+	}
+	// Pour les 9 premières cartes (initial infection)
+	if (indexGlobal < 9) {
+		if (indexGlobal < 3) return 3;
+		if (indexGlobal < 6) return 2;
+		return 1;
+	}
+	// Pour toutes les cartes suivantes : 1 cube
+	return 1;
+}
+
+/** Initialise le panneau propagation avec les infos du prochain lot */
+function initialiserPanelPropagation() {
+	if (paquetPropagationEntier.length === 0) return;
+	var premiereCarte = paquetPropagationEntier[0];
+	var parties = premiereCarte.split('-');
+	var debut = parties[0].trim(); // ex: "1/9" ou "Epidemie n° 1"
+	
+	var nbATirer = "-";
+	if (debut.indexOf('/') >= 0) {
+		var denom = debut.split('/')[1];
+		nbATirer = denom;
+	}
+	document.getElementById('idCartesATirer').textContent = nbATirer;
+	mettreAJourPanelPropagation();
+}
+
+/** Met à jour l'affichage du panneau propagation */
+function mettreAJourPanelPropagation() {
+	document.getElementById('idNbEpidemies').textContent = nbEpidemiesTombees;
+}
+
+/** Met à jour le compteur "Cartes à tirer" d'après la carte qui vient d'être tirée */
+function mettreAJourCartesATirer(carteStr) {
+	if (carteStr.indexOf("Epidemie") >= 0) {
+		return; // une épidémie ne change pas le compteur
+	}
+	// Format: "X/Y - Ville" → extraire X et Y
+	var debut = carteStr.split('-')[0].trim();
+	if (debut.indexOf('/') < 0) return;
+	var num = parseInt(debut.split('/')[0], 10);
+	var denom = parseInt(debut.split('/')[1], 10);
+	if (isNaN(num) || isNaN(denom)) return;
+	var reste = denom - num; // cartes restantes à tirer après celle-ci
+	document.getElementById('idCartesATirer').textContent = reste;
+}
+
+/** Ajoute une carte au panneau de propagation visuel */
+function ajouterCarteAuPanel(carteStr) {
+	var container = document.getElementById('idPropagationCartes');
+	// Enlever le message "En attente"
+	var emptyMsg = container.querySelector('.propagation-empty');
+	if (emptyMsg) emptyMsg.remove();
+
+	if (carteStr.indexOf("Epidemie") >= 0) {
+		// Carte épidémie → va dans le bloc épidémies séparé
+		var epidemiesContainer = document.getElementById('idPropagationEpidemies');
+		var epidemiesCartes = document.getElementById('idEpidemiesCartes');
+		epidemiesContainer.style.display = "block";
+
+		// Extraire le nom de la ville touchée : "Epidemie n° N - City"
+		var parties = carteStr.split('-');
+		var nomVille = parties.length > 1 ? parties[1].trim() : "???";
+		var couleur = getCouleur(nomVille);
+
+		var el = document.createElement('div');
+		el.className = 'propa-card propa-epidemic';
+		el.innerHTML = '<span class="propa-card-label">💀 Épidémie</span>' +
+			'<span class="propa-card-ville carte-color" data-color="' + couleur + '">' + nomVille + '</span>';
+		epidemiesCartes.appendChild(el);
+		return;
+	}
+
+	// Carte ville : extraire uniquement le nom de la ville (sans le "X/Y")
+	var parties = carteStr.split('-');
+	var nomVille = parties[1].trim();
+	var couleur = getCouleur(nomVille);
+	var nbCubes = getNbCubesPourCarte(carteStr, cartesPropagationTirees.length);
+
+	// Construire les petits carrés de cubes
+	var cubesHtml = '';
+	for (var c = 0; c < nbCubes; c++) {
+		cubesHtml += '<span class="cube" style="background-color:' + couleur + ';"></span>';
+	}
+
+	var el = document.createElement('div');
+	el.className = 'propa-card';
+	el.innerHTML =
+		'<span class="propa-card-ville carte-color" data-color="' + couleur + '">' + nomVille + '</span>' +
+		'<span class="propa-card-cubes">' + cubesHtml + '</span>';
+	container.appendChild(el);
+}
+
+
 /** Permet de tourner les cartes du paquet propagation */
 function tournePropogation(){
 	nbCartesPropagationTournees++;
@@ -362,6 +468,17 @@ function tournePropogation(){
 
 	// On récupère 1ère carte du paquet propagation
 	var carte = paquetPropagationEntier.shift();
+	cartesPropagationTirees.push(carte);
+
+	// Détection épidémie
+	if (carte.indexOf("Epidemie") >= 0) {
+		nbEpidemiesTombees++;
+	}
+
+	// Ajout au panneau visuel
+	ajouterCarteAuPanel(carte);
+	mettreAJourPanelPropagation();
+	mettreAJourCartesATirer(carte);
 
 	// On coupe la carte au '-' pour récupérer la 2° partie (qui ne contient que la ville)
 	var ville = carte.split('-');
@@ -378,6 +495,8 @@ function tournePropogation(){
 		document.getElementById('idGoJoueur').innerHTML = "Tour : " + document.getElementById('idJoueur' + joueur + 'Role').innerHTML;
 		document.getElementById('idGoJoueur').className = "goJoueur";
 		surlignerJoueur(joueur);
+		// Mise à jour du lot suivant
+		mettreAJourCartesATirer();
 	}
 	isPseudoGagnePerduCeTour("P");
 }
