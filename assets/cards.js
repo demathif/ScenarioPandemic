@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /** Définition des constantes de l'ensemble des cartes */
 const bleu = ['Atlanta', 'New York', 'Washington', 'Montreal', 'San Francisco', 'Londres', 'Paris', 'Essen', 'Madrid', 'Milan', 'Chicago', 'Saint Petersbourg'];
 const jaune = ['Los Angeles', 'Mexico', 'Miami', 'Bogota', 'Lima', 'Santiago', 'Buenos Aires', 'Sao Paulo', 'Lagos', 'Khartoum', 'Kinshasa', 'Johannesburg'];

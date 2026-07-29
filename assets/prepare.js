@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /** Fonction principale, affiche les personnages: checkbox + image */
 function run () {
 	var myForm = document.getElementById("idBoxes");
@@ -57,15 +55,15 @@ function get_roles (form) {
 	}
 	if (count != limit) { // some roles would be random
 		// Get a copy and remove the choosen roles if any
-		roles_copy = roles.slice();
-        for (var k = 0; k < limit; k++) {
-			roles_copy = roles_copy.filter(e => e !== choice[k]);
+		var roles_copy = roles.slice();
+		for (var k = 0; k < limit; k++) {
+			roles_copy = roles_copy.filter(function(e) { return e !== choice[k]; });
 		}
 		// Ask Ben to shuffle
 		shuffle(roles_copy);
-        for (var j = 0; j < limit-count; j++) {
-			choice[limit-j-1] = roles_copy[j];
-            random_roles+=choice[limit-j-1]+" "
+		for (var j = 0; j < limit - count; j++) {
+			choice[limit - j - 1] = roles_copy[j];
+			random_roles += choice[limit - j - 1] + " ";
 		}
 	}
 	if (random_roles) {

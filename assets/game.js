@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /** Variables globales */
 var paquetJoueur;
 var epidemdiesShuffle;
@@ -7,14 +5,12 @@ var rolesShuffle = [];
 var paquetEpidemie;
 var paquetPropagationEntier = [];
 var nbTours = 0;
-var nbCartesPropagationTournees = 0
+var nbCartesPropagationTournees = 0;
 var pseudos = [];
 var lienSansPseudo = "";
 
 // Permet de bien compter le nombre de tour
 var isChronoDejaTourne = false;
-
-var url = "";
 
 /** Retourne la couleur de la carte */
 function getCouleur(carte){
@@ -22,7 +18,7 @@ function getCouleur(carte){
 		return 'blue';
 	}
 	else if (jaune.indexOf(carte) >= 0) {
-		return 'Orange';
+		return 'orange';
 	}
 	else if (noir.indexOf(carte) >= 0) {
 		return 'black';
@@ -31,9 +27,9 @@ function getCouleur(carte){
 		return 'red';
 	}
 	else if (epidemies.indexOf(carte) >= 0) {
-		return 'MediumSeaGreen';
+		return 'mediumseagreen';
 	}
-	return 'SlateGray';
+	return 'slategray';
 }
 
 
@@ -42,15 +38,15 @@ function getCouleur(carte){
 function miseEnPlaceJoueur(idJoueur) {
 	var cartes = "<ul>";
 	var carte = "";
-	var role=rolesShuffle.shift();
-	for(i = 0 ; i <= 3 ; i++) {
+	var role = rolesShuffle.shift();
+	for (var i = 0; i <= 3; i++) {
 		carte = paquetJoueur.shift();
-		cartes += "<li><font color='" + getCouleur(carte) + "'>" + carte + "</font></li>";
+		cartes += "<li><span class='carte-color' data-color='" + getCouleur(carte) + "'>" + carte + "</span></li>";
 	}
 	cartes += "</ul>";
 	document.getElementById(idJoueur).innerHTML = cartes;
 	document.getElementById(idJoueur + 'Role').innerHTML = role;
-	document.getElementById(idJoueur + 'Image').innerHTML = '<img src=../images/' + encodeURI(role) +'.png width=100 height=130 class="zoomA">';
+	document.getElementById(idJoueur + 'Image').innerHTML = '<img src="../images/' + encodeURI(role) + '.png" width="100" height="130" class="zoomA" alt="' + role + '">';
 }
 
 
@@ -63,8 +59,7 @@ function run () {
 	vars['paquetJoueur'] = "";
 	vars['paquetPropagationEntier'] = "";
 	vars['pseudos'] = "";
-	vars['idUnique'] = ""
-	//var u = 0;
+	vars['idUnique'] = "";
 	var idUnique = 0;
 
 	window.location.href.replace(location.hash, '').replace( 
@@ -133,7 +128,7 @@ function run () {
 		shuffle(paquetEpidemie);
 
 		// Préparation du paquet entier de Propagation
-		prepatationPaquetPropagations();
+		preparationPaquetPropagations();
 	}
 
 	// On teste s'il y a des pseudos
@@ -209,7 +204,7 @@ function tirerCartes(idCarte) {
 
 	// On prend la prochaine carte du paquet
 	var carte = paquetJoueur.shift();
-	document.getElementById(idCarte).innerHTML = "<font color='" + getCouleur(carte) + "'>" + carte + "</font>";
+	document.getElementById(idCarte).innerHTML = "<span class='carte-color' data-color='" + getCouleur(carte) + "'>" + carte + "</span>";
 	document.getElementById('idRecap').innerHTML += carte + "<br />";
 }
 
@@ -240,7 +235,7 @@ function combienTirerDeCartes (nbEpidemies) {
 
 
 /** On crée un paquet de cartes avec déjà toutes les épidémies */
-function prepatationPaquetPropagations() {
+function preparationPaquetPropagations() {
 	var defaussePropagation = [];
 	var nbEpidemies = 0;
 	var villePropagation = [];
@@ -274,7 +269,7 @@ function prepatationPaquetPropagations() {
 		for (var epi = 1 ; epi <= nbEpidemiesEn2Cartes ; epi++) {
 			nbEpidemies++;
 			// On pioche la carte de sous le paquet
-			villeEpidemie = paquetEpidemie.pop();
+			var villeEpidemie = paquetEpidemie.pop();
 
 			// On ajoute la carte épidémie à la défausse
 			defaussePropagation[k++] = villeEpidemie;
@@ -357,7 +352,7 @@ function tournePropogation(){
 	// On coupe la carte au '-' pour récupérer la 2° partie (qui ne contient que la ville)
 	var ville = carte.split('-');
 
-	document.getElementById('idCartesPropagation').innerHTML += ville[0] + "<font color='" + getCouleur(ville[1].substr(1)) + "'>" + ville[1] + "</font><br />";
+	document.getElementById('idCartesPropagation').innerHTML += ville[0] + "<span class='carte-color' data-color='" + getCouleur(ville[1].substring(1)) + "'>" + ville[1].substring(1) + "</span><br />";
 	document.getElementById('idRecap').innerHTML += carte + "<br />";
 
 	// Ici, on tire la X° carte sur X cartes à tirer du paquet propagation
@@ -483,7 +478,6 @@ function rendVisibleOneClick() {
 
 /** Bouton unique pour gagner du temps :) */
 function oneClick() {
-	//alert(document.getElementById('idButtonCarte1').disabled);
 	if (document.getElementById('idButtonCarte2').style.display == "block") {
 		tirerCartes('idCarte2');
 		document.getElementById('idOneClick').innerHTML = document.getElementById('idTournePropagation').innerHTML;
@@ -491,15 +485,12 @@ function oneClick() {
 	else if (document.getElementById('idTournePropagation').disabled == false) {
 		tournePropogation();
 	}
-	else if (document.getElementById('idGoJoueur').disabled == false) {
+	else if (document.getElementById('idGoJoueur').className == "goJoueur") {
 		nouveauTour();
 	}
 	else if (document.getElementById('idButtonCarte1').style.display == "block") {
 		tirerCartes('idCarte1');
 		document.getElementById('idOneClick').innerHTML = document.getElementById('idButtonCarte2').innerHTML;
-	}
-	else {
-		alert("rien");
 	}
 }
 
@@ -514,7 +505,7 @@ function historiquePartie () {
 						"	<th>Nb tour (paquet joueur)</th> "+
 						"	<th>Nb cartes Propagation</th> "+
 						"	<th>Nb remèdes</th> "+
-						"	<th>Nb éclosions</th> "
+						"	<th>Nb éclosions</th> "+
 						"</tr>";
 
 	pseudos.forEach(function(item, index, array) {
