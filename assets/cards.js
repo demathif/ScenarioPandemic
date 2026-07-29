@@ -5,6 +5,16 @@ const noir = ['Alger', 'Le Caire', 'Istanbul', 'Moscou', 'Téhéran', 'Bagdad', 
 const rouge = ['Jakarta', 'Sydney', 'Manille', 'Ho Chi Minh Ville', 'Bangkok', 'Hong Kong', 'Taipei', 'Osaka', 'Tokyo', 'Shanghai', 'Pékin', 'Séoul'];
 const evenements = ['Pont aérien', 'Subvention publique', 'Hôpital mobile', 'Rééxaminer les recherches', 'Traitements à distance', 'Ordres spéciaux', 'Temps emprunté', 'Déploiement de vaccins rapides'];
 const epidemies = ['Pente fatale', 'Structure moléculaire complexe', 'Pertes inacceptables', 'Effet chronique', 'Ingérence gouvernementale', 'Populations non calculées'];
+
+/** Description de chaque épidémie */
+const descriptionsEpidemie = {
+	'Pente fatale': '⚡ Effet Immédiat — Chaque éclosion (outbreak) de la Souche Virulente fait avancer le marqueur d\'éclosion de 2 cases sur la piste au lieu d\'une seule. Cet effet reste actif jusqu\'à ce qu\'une nouvelle carte Épidémie soit piochée.',
+	'Pertes inacceptables': '⚡ Effet Immédiat — Retirez immédiatement 4 cubes de la Souche Virulente de la réserve générale et remettez-les dans la boîte de jeu. Ces cubes ne pourront plus être utilisés, ce qui accélère le risque de défaite par pénurie de cubes.',
+	'Populations non calculées': '⚡ Effet Immédiat — Ajoutez immédiatement 1 cube de la Souche Virulente dans chaque ville du plateau qui en possède déjà au moins un. Cet effet peut facilement déclencher des éclosions en chaîne si plusieurs villes avaient déjà 3 cubes.',
+	'Structure moléculaire complexe': '🔄 Effet Permanent — Découvrir le remède de la Souche Virulente nécessite désormais 6 cartes Joueur de sa couleur (au lieu de 5). Exception officielle : Le Scientifique ignore cette pénalité. Grâce à sa compétence spéciale, il n\'a toujours besoin que de 4 cartes pour trouver le remède.',
+	'Effet chronique': '🔄 Effet Permanent — Lorsque vous devez ajouter un cube de la Souche Virulente dans une ville saine (qui n\'en contient actuellement aucun), vous devez obligatoirement y placer 2 cubes d\'un coup au lieu d\'un seul.',
+	'Ingérence gouvernementale': '🔄 Effet Permanent — Tant que cette carte est active, un joueur qui commence ou entre dans une ville contenant au moins un cube de la Souche Virulente doit obligatoirement utiliser une action pour traiter la maladie (enlever un cube) avant de pouvoir effectuer une action de déplacement pour quitter cette ville. Cet effet est écrasé et remplacé dès qu\'une nouvelle carte Épidémie est piochée.',
+};
 const roles = ['Scientifique', 'Epidémiologiste', 'Opérateur de terrain', 'Spécialiste en quarantaine', 'Généraliste', 'Chercheuse', 'Archiviste', 'Spécialiste en confinement', 'Expert aux opérations', 'Planificateur d\'urgence', 'Médecin'];
 
 

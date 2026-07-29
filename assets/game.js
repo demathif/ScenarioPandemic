@@ -475,7 +475,8 @@ function ajouterCarteAuPanel(carteStr) {
 		el.className = 'propa-card propa-epidemic';
 		var html = '<span class="propa-card-label">💀 Épidémie</span>';
 		if (nomEpidemie) {
-			html += '<span class="propa-card-epidemic-name">' + nomEpidemie + '</span>';
+			var descEpi = descriptionsEpidemie[nomEpidemie] || '';
+			html += '<span class="propa-card-epidemic-name" title="' + descEpi + '">' + nomEpidemie + '</span>';
 		}
 		el.innerHTML = html;
 		epidemiesCartes.appendChild(el);
