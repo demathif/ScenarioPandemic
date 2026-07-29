@@ -1,109 +1,1065 @@
+/* ========================================
+   Scénario Pandemic — Styles modernisés
+   GitHub Pages compatible (100% statique)
+   ======================================== */
+
+/* ---- CSS Custom Properties (variables) ---- */
+:root {
+  /* Palette de couleurs */
+  --color-primary: #2c3e50;
+  --color-primary-light: #34495e;
+  --color-accent: #e74c3c;
+  --color-accent-hover: #c0392b;
+  --color-bg: #fdf6ec;
+  --color-surface: #ffffff;
+  --color-header-bg: #d4836d;
+  --color-header-text: #ffffff;
+  --color-footer-bg: #d4836d;
+  --color-footer-text: #ffffff;
+  --color-text: #2c3e50;
+  --color-text-light: #7f8c8d;
+  --color-border: #e0d5c7;
+  --color-card-bg: #fff8f0;
+
+  /* Couleurs des cartes par maladie */
+  --color-blue: #2980b9;
+  --color-orange: #e67e22;
+  --color-black: #2c3e50;
+  --color-red: #e74c3c;
+  --color-event: #27ae60;
+  --color-epidemic: #8e44ad;
+  --color-default: #95a5a6;
+
+  /* Typographie */
+  --font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+  --font-size-sm: 0.85rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.25rem;
+  --font-size-xl: 1.5rem;
+  --font-size-xxl: 2rem;
+  --font-size-timer: 3rem;
+
+  /* Espacement */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+
+  /* Ombres et bordures */
+  --border-radius: 8px;
+  --border-radius-sm: 4px;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* ---- Reset & Base ---- */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 body {
-	font-family:arial;
-	font-size: 10pt;
-	color:black;
-	background: no-repeat;
-	background-color:OldLace;
-	background-position: top right;
-	background-size: 8%;
-	background-image:url("../images/survival.png");
+  margin: 0;
+  padding: var(--spacing-md);
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  min-height: 100vh;
 }
 
+/* ---- En-tête & Pied de page ---- */
 header {
-	width: 92%;
-	text-align: center;
-	padding: 5px;
-	background-color: DarkSalmon;
-	color: white;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto var(--spacing-lg);
+  padding: var(--spacing-md) var(--spacing-lg);
+  text-align: center;
+  background-color: var(--color-header-bg);
+  color: var(--color-header-text);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+  font-size: var(--font-size-lg);
+  font-weight: 600;
 }
 
-.enCours {
-	float:left;
-	width:40%;
-	font-size: 30pt;
+/* ---- Barre supérieure (titre + menu ☰) ---- */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  text-align: left;
 }
 
-.pasEnCours {
-	float:left;
-	width:30%;
-	font-size: 20pt;
+.topbar-title {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
 }
 
-.carteJoueur {
-	background: no-repeat;
-	background-position: top right;
-	height:300px;
-	background-size: 30%;
-	background-image:url("../images/fond_bleu3.png");
+.topbar-menu {
+  background-color: rgba(255,255,255,0.25);
+  font-size: var(--font-size-xl);
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--border-radius);
+}
+.topbar-menu:hover {
+  background-color: rgba(255,255,255,0.4);
 }
 
-.cartePropagation {
-	background: no-repeat;
-	background-position: top right;
-	height:300px;
-	background-size: 30%;
-	background-image:url("../images/fond_vert3.png");
+/* ---- Menu secondaire (☰) : colonne sous l'en-tête ---- */
+.menu-secondaire {
+  max-width: 1200px;
+  margin: 0 auto var(--spacing-md);
+  padding: var(--spacing-sm);
+  background-color: var(--color-surface);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  animation: menuFadeIn 0.15s ease;
 }
 
-.chrono {
-	height:400px;
-	float:right;
-	width:30%;
-	font-size: 10pt;
+@keyframes menuFadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-.minuteur {
-	font-size: 50pt;
-	margin-bottom: 0;
+.menu-secondaire button {
+  background-color: transparent;
+  color: var(--color-primary);
+  text-align: left;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius-sm);
+  box-shadow: none;
+  width: 100%;
+}
+.menu-secondaire button:hover {
+  background-color: var(--color-bg);
+  color: var(--color-accent);
 }
 
-.joueur {
-	float:left;
-	width:50%;
-	font-size: 30pt;
+.menu-debug {
+  cursor: pointer;
+  font-weight: 500;
+  margin-left: 0;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius-sm);
+}
+.menu-debug:hover {
+  background-color: var(--color-bg);
 }
 
-.divStandard {
-	width:100%;
-	clear:both;
+/* ---- Panneau "À propos" (version / auteurs) ---- */
+.info-panel {
+  max-width: 1200px;
+  margin: 0 auto var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--color-surface);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-light);
+  text-align: center;
 }
 
-.goJoueur {
-	font-size: 20pt;
+/* ---- Lien dans le menu ☰ ---- */
+.menu-item {
+  display: block;
+  color: var(--color-primary);
+  text-decoration: none;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius-sm);
+  font-weight: 500;
+}
+.menu-item:hover {
+  background-color: var(--color-bg);
+  color: var(--color-accent);
 }
 
-.petitsBouttons {
-	float:left;
-	width: 25%;
+/* ---- Notification temporaire (toast) ---- */
+.toast {
+  position: fixed;
+  bottom: var(--spacing-lg);
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 90%;
+  background-color: var(--color-primary);
+  color: white;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-lg);
+  font-size: var(--font-size-base);
+  z-index: 200;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+  text-align: center;
 }
 
-.grosBouttons {
-	float:left;
-	width: 50%;
+/* ---- Écran de sélection des personnages ---- */
+.selection-intro {
+  text-align: center;
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: var(--spacing-sm);
 }
 
-.clear {
-	clear:left;
+/* Bouton Start : occupe une cellule de la grille (taille d'une carte personnage) */
+.btn-start {
+  background: linear-gradient(135deg, #16a085, #1abc9c);
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: none;
+  min-height: 120px;
+  box-shadow: inset 0 -4px 0 rgba(0,0,0,0.15);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.btn-start-icon {
+  font-size: 2rem;
+  line-height: 1;
+}
+.btn-start-text {
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.btn-start:hover {
+  transform: translateY(-2px);
+  box-shadow: inset 0 -4px 0 rgba(0,0,0,0.15), 0 6px 14px rgba(22, 160, 133, 0.45);
 }
 
 footer {
-	text-align: center;
-	padding: 5px;
-	background-color: DarkSalmon;
-	color: white;
+  width: 100%;
+  max-width: 1200px;
+  margin: var(--spacing-xl) auto 0;
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-align: center;
+  background-color: var(--color-footer-bg);
+  color: var(--color-footer-text);
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-sm);
 }
 
-.debug {
-	display: none;
+/* ---- Panneau de propagation ---- */
+.propagation-panel {
+  max-width: 1200px;
+  margin: 0 auto var(--spacing-md);
+  background-color: var(--color-surface);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+  border-left: 4px solid var(--color-event);
+  overflow: hidden;
 }
 
+.propagation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: #e8f5e9;
+  border-bottom: 1px solid var(--color-border);
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.propagation-title {
+  font-weight: 700;
+  font-size: var(--font-size-lg);
+  color: var(--color-event);
+}
+
+.propagation-stats {
+  font-size: var(--font-size-base);
+  color: var(--color-text-light);
+}
+
+.propagation-stats strong {
+  color: var(--color-primary);
+  font-size: var(--font-size-lg);
+  font-family: var(--font-family);
+  font-variant-numeric: tabular-nums;
+}
+
+.propagation-cartes {
+  padding: var(--spacing-sm) var(--spacing-md);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+  min-height: 60px;
+  align-items: center;
+}
+
+.propagation-empty {
+  color: var(--color-text-light);
+  font-style: italic;
+  font-size: var(--font-size-sm);
+  padding: var(--spacing-sm);
+}
+
+/* Carte de propagation individuelle */
+.propa-card {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background-color: var(--color-bg);
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--color-border);
+  font-size: var(--font-size-sm);
+  animation: propaFadeIn 0.3s ease;
+}
+
+@keyframes propaFadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.propa-card.propa-epidemic {
+  background-color: #fce4ec;
+  border-color: var(--color-accent);
+  font-weight: 600;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.propa-card-epidemic-name {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Dernière carte de propagation conservée au début d'un tour (grisée) */
+.propa-card-grisee {
+  opacity: 0.45;
+  filter: grayscale(80%);
+}
+
+.propa-card-ville {
+  font-weight: 600;
+}
+
+.propa-card-cubes {
+  display: inline-flex;
+  gap: 2px;
+  margin-left: var(--spacing-xs);
+}
+
+/* Petit carré représentant un cube de maladie */
+.cube {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  border: 1px solid rgba(0,0,0,0.15);
+  box-shadow: inset 0 1px 2px rgba(255,255,255,0.3);
+}
+
+/* ---- Panneau Épidémies (séparé) ---- */
+.epidemic-panel {
+  max-width: 1200px;
+  margin: 0 auto var(--spacing-md);
+  background-color: var(--color-surface);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+  border-left: 4px solid var(--color-accent);
+  overflow: hidden;
+}
+
+.epidemic-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: #fce4ec;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.epidemic-title {
+  font-weight: 700;
+  font-size: var(--font-size-lg);
+  color: var(--color-accent);
+}
+
+.epidemic-cartes {
+  padding: var(--spacing-sm) var(--spacing-md);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+  min-height: 40px;
+  align-items: center;
+}
+
+/* ---- Blocs Joueurs (côte à côte) ---- */
+.players-row {
+  display: flex;
+  gap: var(--spacing-md);
+  max-width: 1200px;
+  margin: 0 auto var(--spacing-md);
+  justify-content: center;
+}
+
+.joueur {
+  flex: 1;
+  max-width: 500px;
+  min-width: 280px;
+  padding: var(--spacing-md);
+  background-color: var(--color-surface);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+  border: 3px solid transparent;
+  transition: border-color 0.3s, box-shadow 0.3s, opacity 0.3s;
+  opacity: 0.6;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+/* Image à gauche, contenu (titre + cartes) à droite pour combler le blanc */
+.joueur-contenu {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.joueur.joueur-actif {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.2), var(--shadow-md);
+  opacity: 1;
+}
+
+.joueur-header {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.joueur-role {
+  font-size: var(--font-size-base);
+  color: var(--color-text-light);
+  font-weight: 400;
+}
+
+/* Wrapper image + pion */
+.player-card-image-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.player-pawn {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: white;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  z-index: 10;
+  border: 2px solid white;
+}
+
+/* Cartes du joueur : liste en colonne à côté de la photo */
+.joueur-cartes {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.carte-joueur-item {
+  display: inline-block;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background-color: var(--color-bg);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-base);
+  font-weight: 500;
+}
+
+.joueur-cartes .carte-color[data-color="blue"] { color: var(--color-blue); }
+.joueur-cartes .carte-color[data-color="orange"] { color: var(--color-orange); }
+.joueur-cartes .carte-color[data-color="black"] { color: var(--color-black); }
+.joueur-cartes .carte-color[data-color="red"] { color: var(--color-red); }
+.joueur-cartes .carte-color[data-color="mediumseagreen"] { color: var(--color-event); font-weight: 600; }
+.joueur-cartes .carte-color[data-color="slategray"] { color: var(--color-default); }
+
+/* ---- Couleurs des cartes (remplace <font>) ---- */
+.carte-color[data-color="blue"] { color: var(--color-blue); }
+.carte-color[data-color="orange"] { color: var(--color-orange); }
+.carte-color[data-color="black"] { color: var(--color-black); }
+.carte-color[data-color="red"] { color: var(--color-red); }
+.carte-color[data-color="mediumseagreen"] { color: var(--color-event); font-weight: 600; }
+.carte-color[data-color="slategray"] { color: var(--color-default); }
+
+/* ---- Zone des cartes tirées ---- */
+.cartes-tirees {
+  max-width: 1200px;
+  margin: 0 auto var(--spacing-md);
+  min-height: 100px;
+  padding: var(--spacing-md);
+  background-color: var(--color-surface);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+}
+
+#idCarteJoueurs.pasEnCours,
+#idDivCartesPropagation.enCours {
+  border-left: 4px solid var(--color-accent);
+}
+
+#idCarteJoueurs.enCours {
+  border-left: 4px solid var(--color-blue);
+}
+
+#idDivCartesPropagation.pasEnCours {
+  border-left: 4px solid var(--color-text-light);
+}
+
+/* ---- Boutons ---- */
+.boutons-ligne {
+  max-width: 1200px;
+  margin: 0 auto var(--spacing-sm);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  align-items: center;
+}
+
+button {
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  border: none;
+  border-radius: var(--border-radius-sm);
+  background-color: var(--color-primary);
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s, opacity 0.2s, transform 0.1s;
+  box-shadow: var(--shadow-sm);
+}
+
+button:hover:not(:disabled) {
+  background-color: var(--color-primary-light);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+button.primary {
+  background-color: var(--color-accent);
+}
+button.primary:hover:not(:disabled) {
+  background-color: var(--color-accent-hover);
+}
+
+button.secondary {
+  background-color: var(--color-text-light);
+}
+
+/* ---- Bouton unique (tirage automatique) ---- */
+.boutons-auto {
+  justify-content: center;
+}
+
+.bouton-unique {
+  background-color: #16a085;
+  color: white;
+  font-weight: 700;
+  padding: var(--spacing-sm) var(--spacing-xl);
+  min-width: 260px;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+  line-height: 1.2;
+}
+.bouton-unique-icone {
+  font-size: var(--font-size-xxl);
+  line-height: 1;
+}
+.bouton-unique-label {
+  font-size: var(--font-size-lg);
+}
+.bouton-unique:hover:not(:disabled) {
+  background-color: #138a72;
+}
+
+/* ---- Menu pause du chrono ---- */
+.chrono-menu {
+  max-width: 1200px;
+  margin: 0 auto var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: #fff8e1;
+  border-radius: var(--border-radius);
+  border-left: 4px solid #f39c12;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.chrono-menu-title {
+  font-weight: 700;
+  color: #b7791f;
+}
+
+.chrono-menu-buttons {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ---- "Tour : [Rôle]" ---- */
+.goJoueur {
+  display: inline-block;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--color-accent);
+  color: white;
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  box-shadow: var(--shadow-sm);
+}
+
+/* "Tour..." : masqué (le joueur actif est indiqué par le cadre surligné) */
+#idGoJoueur {
+  display: none;
+}
+
+/* ---- Bouton copie de lien (discret, en haut à droite) ---- */
+.btn-copy {
+  position: fixed;
+  top: var(--spacing-sm);
+  right: var(--spacing-sm);
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  font-size: var(--font-size-lg);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-md);
+  z-index: 100;
+}
+
+/* ---- Chronomètre ---- */
+.chrono {
+  max-width: 1200px;
+  margin: 0 auto var(--spacing-md);
+  padding: var(--spacing-md);
+  background-color: var(--color-surface);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+  text-align: center;
+}
+
+.chrono-options {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-sm);
+}
+
+.chrono-options label {
+  cursor: pointer;
+  font-size: var(--font-size-base);
+}
+
+.chrono-options input[type="radio"] {
+  margin-right: var(--spacing-xs);
+}
+
+.minuteur {
+  font-size: var(--font-size-timer);
+  font-weight: 700;
+  margin: var(--spacing-sm) 0;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-primary);
+}
+
+.chrono-boutons {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+/* ---- Sections de fin de partie ---- */
+.section-action {
+  max-width: 1200px;
+  margin: 0 auto var(--spacing-md);
+  padding: var(--spacing-md);
+  background-color: var(--color-surface);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ---- Section "Partie terminée" modernisée ---- */
+.fin-partie-header {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.fin-partie-header strong {
+  font-size: var(--font-size-lg);
+  color: var(--color-primary);
+}
+
+.fin-partie-sub {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-light);
+}
+
+.fin-partie-corps {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.fin-partie-corps label {
+  margin-right: 0;
+}
+
+.fin-pseudo input {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+}
+
+.fin-resultat {
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.btn-save {
+  font-weight: 700;
+}
+
+.section-action label {
+  margin-right: var(--spacing-md);
+}
+
+.section-action input[type="text"] {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+}
+
+.section-action select {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  background-color: white;
+}
+
+/* ---- Debug ---- */
+.debug-section {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.debug-section summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--color-text-light);
+  padding: var(--spacing-sm) 0;
+}
+
+#idDivDebug {
+  max-width: 1200px;
+  margin: 0 auto var(--spacing-md);
+  padding: var(--spacing-md);
+  background-color: var(--color-surface);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+}
+
+#idDivDebug a {
+  color: var(--color-accent);
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+#idDivDebug a:hover {
+  color: var(--color-accent-hover);
+}
+
+/* ---- Tableau d'historique ---- */
+#idSpoilHistoJoueurs table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: var(--spacing-sm);
+}
+
+#idSpoilHistoJoueurs th,
+#idSpoilHistoJoueurs td {
+  border: 1px solid var(--color-border);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  text-align: center;
+}
+
+#idSpoilHistoJoueurs th {
+  background-color: var(--color-header-bg);
+  color: var(--color-header-text);
+}
+
+/* ---- Image des rôles ---- */
 .zoomA {
-	width: 100;
-	height: 130;
-	/* ease | ease-in | ease-out | linear */
-	transition: transform ease-in-out 0.3s;
+  width: 100px;
+  height: 130px;
+  border-radius: var(--border-radius-sm);
+  box-shadow: var(--shadow-sm);
 }
 
-.zoomA:hover {
-	transform: scale(4);
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+  body {
+    padding: var(--spacing-xs);
+  }
+
+  header {
+    font-size: var(--font-size-base);
+    padding: var(--spacing-sm);
+  }
+
+  .players-row {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .joueur {
+    width: 100%;
+    max-width: 100%;
+    min-width: unset;
+  }
+
+  .boutons-ligne {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .boutons-ligne button {
+    width: 100%;
+  }
+
+  .bouton-unique {
+    width: 100%;
+    min-width: 0;
+    font-size: var(--font-size-base);
+    padding: var(--spacing-md);
+  }
+
+  .menu-secondaire {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .menu-secondaire button {
+    width: 100%;
+  }
+
+  .menu-debug {
+    margin-left: 0;
+    padding: var(--spacing-xs) 0;
+  }
+
+  .fin-partie-corps {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .minuteur {
+    font-size: 2.5rem;
+  }
+
+  .chrono-options {
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+}
+
+@media (max-width: 480px) {
+  .minuteur {
+    font-size: 2rem;
+  }
+
+  .section-action {
+    padding: var(--spacing-sm);
+  }
+
+  /* Cadres joueurs compacts : photo à gauche, cartes en colonne à droite */
+  .joueur {
+    gap: var(--spacing-sm);
+  }
+
+  .joueur-image img {
+    width: 70px;
+    height: auto;
+  }
+
+  #idSpoilHistoJoueurs table {
+    font-size: var(--font-size-sm);
+  }
+}
+
+/* ---- Grille de sélection des personnages (galerie) ---- */
+.character-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 0;
+  max-width: 960px;
+  margin: var(--spacing-sm) auto;
+  padding: 0;
+}
+
+.character-card {
+  position: relative;
+  background: transparent;
+  border-radius: 2px;
+  overflow: hidden;
+  transition: transform 0.15s;
+  cursor: pointer;
+}
+
+.character-card:hover {
+  transform: translateY(-2px);
+}
+
+.character-card:has(.character-checkbox:checked) {
+  outline: 3px solid var(--color-accent);
+  outline-offset: -3px;
+}
+
+.character-checkbox {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.character-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+  cursor: pointer;
+  gap: 2px;
+}
+
+.character-label img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 160 / 200;
+  object-fit: cover;
+  border-radius: 2px;
+  background-color: var(--color-bg);
+}
+
+.character-name {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  text-align: center;
+  color: var(--color-primary);
+  line-height: 1.2;
+  padding: 2px 0;
+}
+
+/* Badge "✓" qui apparaît quand sélectionné */
+.character-selected-badge {
+  position: absolute;
+  top: var(--spacing-sm);
+  right: var(--spacing-sm);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: var(--color-accent);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  opacity: 0;
+  transform: scale(0.5);
+  transition: opacity 0.2s, transform 0.2s;
+  pointer-events: none;
+}
+
+.character-card:has(.character-checkbox:checked) .character-selected-badge {
+  opacity: 1;
+  transform: scale(1);
+}
+
+@media (max-width: 768px) {
+  .character-grid {
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 0;
+    padding: 0;
+  }
+
+  .character-name {
+    font-size: var(--font-size-sm);
+  }
+}
+
+@media (max-width: 480px) {
+  .character-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+  }
+
+  .character-label {
+    padding: 0;
+  }
+
+  .character-label img {
+    max-width: 100%;
+  }
 }

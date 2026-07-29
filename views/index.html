@@ -1,40 +1,17 @@
 <!doctype html>
 <html lang="fr">
-	
 	<head>
-		<title>Scénarios Pandémie</title>
 		<meta charset="utf-8">
-		<link rel="icon" href="../images/survival.ico" />
-		<link rel="stylesheet" href="../style/style.css">
-		<script type="text/javascript" src = "../assets/cards.js"></script>
-		<script type="text/javascript" src = "../assets/prepare.js"></script>
-		<script></script>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Scénarios Pandémie</title>
+		<script>
+			// Redirige vers la page unique (game.html) en conservant les paramètres de l'URL
+			window.location.replace("game.html" + window.location.search);
+		</script>
 	</head>
-	
-	<body onload="run();">
-		<header>
-			Bienvenue à Scénario Pandemic, scénario aléatoire du type demi-finales du championnat du monde
-		</header>
-		
-		<br />
-		
-		Choisissez 0, 1 ou 2 personnages :
-		<p>
-			<center>
-				<form id="idBoxes" name="thisForm"><br/>
-					<input type="button" value="Start" onclick="get_roles(document.thisForm);">
-				</form>
-			</center>
+	<body>
+		<p style="font-family: sans-serif; text-align: center; margin-top: 3rem;">
+			Redirection vers la partie…
 		</p>
-
-		<p>
-			<a href="https://docs.google.com/spreadsheets/d/1zwSPXdVmSMyLT-hhdvtLy0Kp2LJ_qGabPaC65YANEVw/edit?gid=0#gid=0" target="_blank">Lien des précédentes parties</a>
-		</p>
-		
-		<footer>
-			v0.7.0<br />
-			Author : Potaw (CDM 2019 avec Yo)
-		</footer>
-		
 	</body>
 </html>
