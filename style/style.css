@@ -176,6 +176,18 @@ footer {
   background-color: #fce4ec;
   border-color: var(--color-accent);
   font-weight: 600;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.propa-card-epidemic-name {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .propa-card-ville {
@@ -535,16 +547,8 @@ button.secondary {
 .zoomA {
   width: 100px;
   height: 130px;
-  transition: transform ease-in-out 0.3s;
   border-radius: var(--border-radius-sm);
   box-shadow: var(--shadow-sm);
-}
-
-.zoomA:hover {
-  transform: scale(4);
-  z-index: 100;
-  position: relative;
-  box-shadow: var(--shadow-lg);
 }
 
 /* ---- Responsive ---- */

@@ -20,6 +20,9 @@ var nbEpidemiesTombees = 0;
 var cubesParVille = {};
 var cartesPropagationTirees = [];
 
+/** Noms des épidémies dans l'ordre où elles sont rencontrées */
+var epidemiesNom = [];
+
 /** Retourne la couleur de la carte */
 function getCouleur(carte){
 	if(bleu.indexOf(carte) >= 0) {
@@ -282,9 +285,11 @@ function preparationPaquetPropagations() {
 		// Combien d'épidémies dans les 2 prochaines cartes ?
 		if (epidemies.indexOf(paquetJoueur[i]) >= 0) {
 			nbEpidemiesEn2Cartes++;
+			epidemiesNom.push(paquetJoueur[i]);
 		}
 		if (epidemies.indexOf(paquetJoueur[i + 1]) >= 0) {
 			nbEpidemiesEn2Cartes++;
+			epidemiesNom.push(paquetJoueur[i + 1]);
 		}
 
 		// On boucle sur le nombre de cartes épidémies tournées en 2 cartes
@@ -396,10 +401,48 @@ function mettreAJourPanelPropagation() {
 	document.getElementById('idNbEpidemies').textContent = nbEpidemiesTombees;
 }
 
+/** Retourne le nombre d'épidémies en tête du paquet propagation restant */
+function compterEpidemiesEnTete() {
+	var count = 0;
+	for (var i = 0; i < paquetPropagationEntier.length; i++) {
+		if (paquetPropagationEntier[i].indexOf("Epidemie") >= 0) {
+			count++;
+		} else {
+			break;
+		}
+	}
+	return count;
+}
+
 /** Met à jour le compteur "Cartes à tirer" d'après la carte qui vient d'être tirée */
 function mettreAJourCartesATirer(carteStr) {
+	if (!carteStr) {
+		// Fin de lot : initialiser le compteur pour le lot suivant
+		if (paquetPropagationEntier.length > 0) {
+			var nbEpiTete = compterEpidemiesEnTete();
+			var prochaineReguliere = paquetPropagationEntier[nbEpiTete];
+			if (prochaineReguliere) {
+				var debut = prochaineReguliere.split('-')[0].trim();
+				if (debut.indexOf('/') >= 0) {
+					var denom = parseInt(debut.split('/')[1], 10);
+					if (!isNaN(denom)) {
+						document.getElementById('idCartesATirer').textContent = denom + nbEpiTete;
+					}
+				}
+			}
+		}
+		return;
+	}
+	// Une épidémie → décrémenter le compteur (elle compte comme une carte tirée)
 	if (carteStr.indexOf("Epidemie") >= 0) {
-		return; // une épidémie ne change pas le compteur
+		var actuel = document.getElementById('idCartesATirer').textContent;
+		if (actuel !== '-' && actuel !== '') {
+			var reste = parseInt(actuel, 10);
+			if (!isNaN(reste) && reste > 0) {
+				document.getElementById('idCartesATirer').textContent = reste - 1;
+			}
+		}
+		return;
 	}
 	// Format: "X/Y - Ville" → extraire X et Y
 	var debut = carteStr.split('-')[0].trim();
@@ -419,21 +462,38 @@ function ajouterCarteAuPanel(carteStr) {
 	if (emptyMsg) emptyMsg.remove();
 
 	if (carteStr.indexOf("Epidemie") >= 0) {
-		// Carte épidémie → va dans le bloc épidémies séparé
+		// Carte épidémie → va dans le bloc épidémies séparé (sans la ville)
 		var epidemiesContainer = document.getElementById('idPropagationEpidemies');
 		var epidemiesCartes = document.getElementById('idEpidemiesCartes');
 		epidemiesContainer.style.display = "block";
 
-		// Extraire le nom de la ville touchée : "Epidemie n° N - City"
-		var parties = carteStr.split('-');
-		var nomVille = parties.length > 1 ? parties[1].trim() : "???";
-		var couleur = getCouleur(nomVille);
+		// Extraire le numéro d'épidémie pour retrouver son nom
+		var numEpi = parseInt(carteStr.replace(/^Epidemie n° (\d+).*$/, '$1'), 10);
+		var nomEpidemie = (!isNaN(numEpi) && epidemiesNom[numEpi - 1]) ? epidemiesNom[numEpi - 1] : '';
 
 		var el = document.createElement('div');
 		el.className = 'propa-card propa-epidemic';
-		el.innerHTML = '<span class="propa-card-label">💀 Épidémie</span>' +
-			'<span class="propa-card-ville carte-color" data-color="' + couleur + '">' + nomVille + '</span>';
+		var html = '<span class="propa-card-label">💀 Épidémie</span>';
+		if (nomEpidemie) {
+			html += '<span class="propa-card-epidemic-name">' + nomEpidemie + '</span>';
+		}
+		el.innerHTML = html;
 		epidemiesCartes.appendChild(el);
+
+		// La ville touchée est aussi ajoutée dans le flux principal de propagation (avec 3 cubes comme dans les règles)
+		var parties = carteStr.split('-');
+		var nomVille = parties.length > 1 ? parties[1].trim() : "???";
+		var couleur = getCouleur(nomVille);
+		var elVille = document.createElement('div');
+		elVille.className = 'propa-card';
+		var cubesHtml = '';
+		for (var c = 0; c < 3; c++) {
+			cubesHtml += '<span class="cube" style="background-color:' + couleur + ';"></span>';
+		}
+		elVille.innerHTML =
+			'<span class="propa-card-ville carte-color" data-color="' + couleur + '">' + nomVille + '</span>' +
+			'<span class="propa-card-cubes">' + cubesHtml + '</span>';
+		container.appendChild(elVille);
 		return;
 	}
 
