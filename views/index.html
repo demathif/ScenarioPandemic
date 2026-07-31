@@ -1,126 +1,17 @@
 <!doctype html>
 <html lang="fr">
 	<head>
-		<title>Scénarios Pandémie</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<link rel="icon" href="../images/survival.ico" />
-		<link rel="stylesheet" href="../style/style.css?v=20">
-		<script type="text/javascript" src="../assets/cards.js?v=20"></script>
-	</head>
-	
-	<body onload="run();">
-		<header>
-			🎲 Scénario Pandemic — Sélection des personnages
-		</header>
-
-		<div class="section-action">
-			<p style="text-align:center; font-size:var(--font-size-lg);">
-				Choisissez <strong>0, 1 ou 2 personnages</strong>, puis cliquez sur <strong>Start</strong>.
-				<br/>
-				<span style="font-size:var(--font-size-sm); color:var(--color-text-light);">
-					Les personnages non choisis seront attribués aléatoirement.
-				</span>
-			</p>
-			<form id="idBoxes" name="thisForm">
-				<!-- La grille des personnages est générée ici par prepare.js -->
-			</form>
-			<div style="text-align:center; margin-top:var(--spacing-lg);">
-				<button type="button" onclick="get_roles(document.thisForm);" class="primary" style="font-size:var(--font-size-lg); padding:var(--spacing-md) var(--spacing-xl);">
-					🎮 Start
-				</button>
-			</div>
-		</div>
-
-		<div class="section-action">
-			<a href="https://docs.google.com/spreadsheets/d/1zwSPXdVmSMyLT-hhdvtLy0Kp2LJ_qGabPaC65YANEVw/edit?gid=0#gid=0" target="_blank">📊 Lien des précédentes parties</a>
-		</div>
-		
-		<footer>
-			v0.9.0<br />
-			Author : Potaw (CDM 2019 avec Yo)
-		</footer>
-
-		<script type="text/javascript">
-			/** Fonction principale, affiche les personnages en grille de cartes modernes */
-			function run () {
-				var myForm = document.getElementById("idBoxes");
-				var grid = document.createElement("div");
-				grid.className = "character-grid";
-
-				for (var i = 0; i < roles.length; i++) {
-					var card = document.createElement("div");
-					card.className = "character-card";
-
-					var checkBox = document.createElement("input");
-					checkBox.type = "checkbox";
-					checkBox.value = roles[i];
-					checkBox.id = "id" + i;
-					checkBox.className = "character-checkbox";
-
-					var label = document.createElement("label");
-					label.className = "character-label";
-					label.htmlFor = "id" + i;
-
-					var img = document.createElement("img");
-					img.src = "./../images/" + encodeURI(roles[i]) + ".png";
-					img.alt = roles[i];
-					img.title = descriptionsRole[roles[i]] || roles[i];
-					img.loading = "lazy";
-
-					var nameSpan = document.createElement("span");
-					nameSpan.className = "character-name";
-					nameSpan.textContent = roles[i];
-
-					var selectedBadge = document.createElement("span");
-					selectedBadge.className = "character-selected-badge";
-					selectedBadge.textContent = "✓";
-
-					label.appendChild(img);
-					label.appendChild(nameSpan);
-					card.appendChild(checkBox);
-					card.appendChild(label);
-					card.appendChild(selectedBadge);
-					grid.appendChild(card);
-				}
-				myForm.appendChild(grid);
-			}
-
-			/** onclick, on recupere les roles du form sinon on les choisit aléatoirement */
-			function get_roles (form) {
-				var count = 0;
-				var choice = [];
-				var limit = 2; // FIXME: what if more that 2 players
-
-				var checkboxes = form.querySelectorAll('input[type="checkbox"]');
-				for (var i = 0; i < checkboxes.length; i++) {
-					if (checkboxes[i].checked) {
-						if (count < limit) {
-							choice[count] = checkboxes[i].value;
-							count++;
-						} else if (count >= limit) {
-							alert("Vous ne pouvez pas choisir plus de " + limit + " personnages");
-							return;
-						}
-					}
-				}
-				if (count != limit) { // some roles would be random
-					// Get a copy and remove the choosen roles if any
-					var roles_copy = roles.slice();
-					for (var k = 0; k < limit; k++) {
-						roles_copy = roles_copy.filter(function(e) { return e !== choice[k]; });
-					}
-					shuffle(roles_copy);
-					for (var j = 0; j < limit - count; j++) {
-						choice[limit - j - 1] = roles_copy[j];
-					}
-				}
-
-				shuffle(choice);
-				window.location.replace("../views/game.html?" +
-								"&roleJoueur1=" +  encodeURI(choice[0]) +
-								"&roleJoueur2=" +  encodeURI(choice[1]));
-			}
+		<title>Scénarios Pandémie</title>
+		<script>
+			// Redirige vers la page unique (game.html) en conservant les paramètres de l'URL
+			window.location.replace("game.html" + window.location.search);
 		</script>
+	</head>
+	<body>
+		<p style="font-family: sans-serif; text-align: center; margin-top: 3rem;">
+			Redirection vers la partie…
+		</p>
 	</body>
 </html>

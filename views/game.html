@@ -5,23 +5,24 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link rel="icon" href="../images/survival.ico" />
-		<link rel="stylesheet" href="../style/style.css?v=20">
-		<script type="text/javascript" src="../assets/cards.js?v=20"></script>
-		<script type="text/javascript" src="../assets/game.js?v=20"></script>
+		<link rel="stylesheet" href="../style/style.css?v=26">
+		<script type="text/javascript" src="../assets/cards.js?v=26"></script>
+		<script type="text/javascript" src="../assets/game.js?v=26"></script>
 	</head>
 	
 	<body onload="run();">
 		<header class="topbar">
-			<span class="topbar-title">🎲 Scénario Pandemic</span>
+			<span class="topbar-title">🦠 Scénario Pandemic</span>
 			<button class="topbar-menu" onclick="toggleMenu()" title="Menu">☰</button>
 		</header>
 
-		<!-- Menu secondaire : actions accessoires (partie terminée, lien, nouvelle partie, debug) -->
+		<!-- Menu secondaire : actions accessoires (actions de jeu masquées sur la sélection) -->
 		<div id="idMenuSecondaire" class="menu-secondaire" style="display:none;">
-			<button onclick="toggleFinPartie()">🏁 Partie terminée</button>
-			<button onclick="genererLienPartie()">📋 Copier le lien</button>
-			<button onclick="nouvellePartie()">🔄 Nouvelle partie</button>
-			<label class="menu-debug"><input id="idDebug" type="checkbox" onclick="debug()"> 🐞 Debug</label>
+			<button onclick="toggleFinPartie()" class="menu-jeu">🏁 Partie terminée</button>
+			<button onclick="genererLienPartie()" class="menu-jeu">📋 Copier le lien</button>
+			<button onclick="nouvellePartie()" class="menu-jeu">🔄 Nouvelle partie</button>
+			<a class="menu-item" href="https://docs.google.com/spreadsheets/d/1zwSPXdVmSMyLT-hhdvtLy0Kp2LJ_qGabPaC65YANEVw/edit?gid=0#gid=0" target="_blank">📊 Lien des précédentes parties</a>
+			<label class="menu-debug menu-jeu"><input id="idDebug" type="checkbox" onclick="debug()"> 🐞 Debug</label>
 			<button onclick="toggleInfo()">ℹ️ À propos</button>
 		</div>
 
@@ -31,10 +32,26 @@
 			Authors : Potaw (CDM 2019 avec Yo) et Fk (sparring de la CDM 2019)
 		</div>
 
+		<!-- Notification temporaire (toast) -->
+		<div id="idToast" class="toast" style="display:none;"></div>
+
+		<!-- ═══════ VUE SÉLECTION DES PERSONNAGES ═══════ -->
+		<div id="idViewSelection" class="view-selection">
+			<div class="section-action">
+				<p class="selection-intro">Choisissez vos personnages</p>
+				<form id="idBoxes" name="thisForm">
+					<!-- La grille + le bouton Start sont générés ici par genererGrillePersonnages() -->
+				</form>
+			</div>
+		</div>
+
+		<!-- ═══════ VUE JEU ═══════ -->
+		<div id="idViewJeu" style="display:none;">
+
 		<div class="boutons-ligne boutons-auto">
 			<button onclick="boutonUnique()" id="idBoutonUnique" class="bouton-unique">🎯 Tirer (auto)</button>
 			<!-- "Tour : [Rôle]" masqué : le joueur actif est indiqué par le cadre surligné -->
-			<span id="idGoJoueur" onmouseover="reAfficher();" style="display:none;">Tour...</span>
+			<span id="idGoJoueur" style="display:none;">Tour...</span>
 		</div>
 
 		<!-- Menu pause du chrono (affiché quand on clique sur le bouton unique pendant le décompte) -->
@@ -101,7 +118,6 @@
 			<button id="idButtonCarte1" onclick="tirerCartes('idCarte1')" disabled>Tirer 1<sup>ère</sup> carte</button>
 			<button id="idButtonCarte2" onclick="tirerCartes('idCarte2')" style="display: none;">Tirer 2<sup>nde</sup> carte</button>
 			<button id="idTournePropagation" onclick="tournePropogation()" class="primary">Tirer carte propagation</button>
-			<button onclick="oneClick()" id="idOneClick" class="secondary">Tirer carte propagation</button>
 		</div>
 
 		<!-- Affichages legacy redondants (masqués, conservés pour la logique) -->
@@ -174,7 +190,9 @@
 				<div id="idSpoilHistoJoueurs" style="display: none;"></div>
 			</div>
 		</div>
-		
-		<script type="text/javascript" src="../assets/minuteur.js?v=20"></script>
+
+		</div><!-- /idViewJeu -->
+
+		<script type="text/javascript" src="../assets/minuteur.js?v=26"></script>
 	</body>
 </html>

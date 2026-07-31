@@ -46,25 +46,22 @@ qui représentent la mise en place du plateau (infections de départ).
 
 Chaque tour suit cet ordre : **survol timer → tirage joueur → propagation**.
 
-#### Étape 1 — Survol du chrono (démarrage du tour)
+#### Étape 1 — Démarrage du tour (chrono)
 
 | # | Action utilisateur | Élément cible | Fonction appelée |
 |---|-------------------|---------------|-----------------|
-| 9 | **Survole** la zone du chronomètre → active le bouton "Tirer 1ʳᵉ carte" et démarre le tour | `<div onmouseover="nouveauTour()">` | [`nouveauTour()`](assets/game.js:387) |
-| 10 | (Optionnel) **Sélectionne** la durée :<br>- **"Tour 1"** (120s) – cochée par défaut<br>- **"Tours suivants"** (80s) | `<input type="radio" name="duration">` | `resetTimer()` |
-| 11 | **Clic** sur **▶️ Démarrer** | `<button onclick="startTimer()">` | [`startTimer()`](assets/minuteur.js:33) |
-| 12 | **Attend** que le chrono atteigne 0 (bip sonore) | — | — |
-| — | Ou **Clic** sur **⏸️ Pause** / **⏯️ Reprendre** / **⏹️ Reset** (optionnel) | Boutons chrono | [`pauseTimer()`](assets/minuteur.js:39) / [`resumeTimer()`](assets/minuteur.js:45) / [`resetTimer()`](assets/minuteur.js:52) |
+| 9 | **Clic** sur le bouton unique "**▶ Nouveau tour**" → lance le chrono (2 min tour 1, 1 min 20 ensuite) | [`#idBoutonUnique`](views/game.html:61) | [`boutonUnique()`](assets/game.js) |
+| 10 | Le bouton affiche le **décompte** (`⏸ MM:SS`) pendant que le chrono tourne | [`#idBoutonUnique`](views/game.html:61) | — |
+| 11 | **Attend** que le chrono atteigne 0 (bip sonore) | — | — |
+| — | En cas de problème : **Clic** sur le bouton pendant le décompte → pause + menu | [`#idMenuChrono`](views/game.html:67) | [`choixChrono()`](assets/game.js) |
 
 #### Étape 2 — Tirage des 2 cartes joueur
 
 | # | Action utilisateur | Élément cible | Fonction appelée |
 |---|-------------------|---------------|-----------------|
-| 13 | **Clic** sur **"Tirer 1ʳᵉ carte"** (maintenant actif) | [`#idButtonCarte1`](views/game.html:38) | [`tirerCartes('idCarte1')`](assets/game.js:178) |
-| 14 | **Observe** la carte tirée s'afficher (nom + couleur) | [`#idCarte1`](views/game.html:59) | — |
-| 15 | **Clic** sur **"Tirer 2ⁿᵈᵉ carte"** (apparaît après la 1ʳᵉ) | [`#idButtonCarte2`](views/game.html:39) | [`tirerCartes('idCarte2')`](assets/game.js:178) |
-| 16 | **Observe** la 2ᵉ carte tirée s'afficher | [`#idCarte2`](views/game.html:60) | — |
-| 17 | **Observe** que le bouton **"Tirer carte propagation"** est maintenant actif | [`#idTournePropagation`](views/game.html:44) | — |
+| 12 | **Clic** sur le bouton unique (**"J1"** ou **"J2"**) → tire la 1ʳᵉ carte du joueur actif | [`#idBoutonUnique`](views/game.html:61) | [`boutonUnique()`](assets/game.js) |
+| 13 | **Observe** la carte tirée s'afficher dans le cadre du joueur actif | [`#idJoueur1Cartes`](views/game.html) / [`#idJoueur2Cartes`](views/game.html) | — |
+| 14 | **Clic** à nouveau sur le bouton unique → tire la 2ᵉ carte | [`#idBoutonUnique`](views/game.html:61) | [`boutonUnique()`](assets/game.js) |
 
 ⚠️ Si le paquet joueur est vide au moment de tirer → `alert("Désolé, il ne reste plus de carte... vous avez perdu !")` → partie terminée.
 
@@ -72,21 +69,26 @@ Chaque tour suit cet ordre : **survol timer → tirage joueur → propagation**.
 
 | # | Action utilisateur | Élément cible | Fonction appelée |
 |---|-------------------|---------------|-----------------|
-| 18 | **Clic** sur **"Tirer carte propagation"** | [`#idTournePropagation`](views/game.html:44) | [`tournePropogation()`](assets/game.js:347) |
-| 19 | **Observe** la carte de propagation s'afficher (ville ou épidémie) | [`#idCartesPropagation`](views/game.html:64) | — |
-| 20 | **Répète** les étapes 18-19 pour chaque carte du lot (2, 3 ou 4 cartes) | — | — |
-| 21 | **Observe** l'affichage "**Tour : [Nom du rôle]**" quand le lot est fini → retour à l'étape 1 (survol timer) | [`#idGoJoueur`](views/game.html:45) | — |
+| 15 | Le bouton unique affiche "**🦠 Propagation**" → **Clic** pour tirer une carte de propagation | [`#idBoutonUnique`](views/game.html:61) | [`boutonUnique()`](assets/game.js) |
+| 16 | **Observe** la carte s'afficher dans le panneau propagation (ville + cubes) ou dans le panneau épidémies | [`#idPropagationCartes`](views/game.html) / [`#idPropagationEpidemies`](views/game.html) | — |
+| 17 | **Répète** pour chaque carte du lot (2, 3 ou 4 cartes) | — | — |
+| 18 | Quand le lot est fini → le bouton affiche "**▶ Nouveau tour**" pour le joueur suivant | [`#idBoutonUnique`](views/game.html:61) | — |
 
 ---
 
-### 3c. Raccourci : bouton "one click"
+### 3c. Le bouton unique (résumé)
 
-| # | Action utilisateur | Élément cible | Fonction appelée |
-|---|-------------------|---------------|-----------------|
-| — | **Clic** sur **"Tirer carte propagation"** (bouton du bas, à droite) | [`#idOneClick`](views/game.html:50) | [`oneClick()`](assets/game.js:485) |
+Le bouton **🎯** gère toute la séquence automatiquement selon l'état du jeu :
 
-→ Ce bouton enchaîne automatiquement selon l'état courant : tirage 2ⁿᵈᵉ carte → propagation → tirage 1ʳᵉ carte.
-⚠️ Il ne peut **pas** déclencher le survol du timer ([`nouveauTour()`](assets/game.js:387)) car il teste [`idGoJoueur.disabled`](assets/game.js:494) qui est indéfini sur un `<span>` — le survol reste manuel.
+| Libellé du bouton | Action |
+|-------------------|--------|
+| `🦠 Propagation` | Tire une carte de propagation (initiale ou de tour) |
+| `J1` / `J2` | Tire la 1ʳᵉ puis la 2ᵉ carte du joueur actif |
+| `▶ Nouveau tour` | Démarre le tour et lance le chrono (2 min / 1 min 20) |
+| `⏸ MM:SS` | Chrono en cours ; un clic met en pause |
+| `⏸ En pause` | Menu ouvert (🔄 Reset / ⏯️ Reprise / ⏹️ Stop) |
+
+Les actions secondaires (**Partie terminée, Copier le lien, Nouvelle partie, Debug, À propos**) sont accessibles via le menu **☰** en haut à droite.
 
 ---
 

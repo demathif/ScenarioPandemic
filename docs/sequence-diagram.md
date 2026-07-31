@@ -89,16 +89,14 @@ sequenceDiagram
 
         Note over Joueur,PressePapier: ─── 3b. Phase de chrono ───
 
-        Joueur->>Timer: Survole le chrono
-        Timer->>Timer: Detecte survol
-        Timer->>GameJS: nouveauTour()
-        GameJS->>GameJS: nbTours++
-        GameJS->>Display: Cache les cartes joueur
-        GameJS->>Display: Ajoute entrée "Tour N : [Rôle]" au récap
-        Joueur->>Timer: Sélectionne durée (120s tour1, 80s suivants)
-        Joueur->>Timer: Clique ▶️ Démarrer
-        Timer->>Timer: startTimer() – Compte à rebours
+        Joueur->>Game: Clique "▶ Nouveau tour" (bouton unique)
+        Game->>GameJS: boutonUnique()
+        GameJS->>GameJS: nouveauTour() – nbTours++
+        GameJS->>Timer: startTimerDuree(120s tour1 / 80s suivants)
+        Timer->>Timer: Compte à rebours
+        GameJS->>Display: Le bouton affiche "⏸ MM:SS"
         Timer->>Timer: À 0 – beep()
+        Note over Joueur: En cas de problème : clic pendant le décompte<br/>→ pause + menu (Reset / Reprise / Stop)
 
         Note over Joueur,PressePapier: ─── 3c. Phase de propagation ───
 
@@ -118,7 +116,7 @@ sequenceDiagram
             Joueur->>Game: Clique à nouveau "Tirer carte propagation"
         end
         
-        Note over Joueur: Option : utiliser le bouton "oneClick"<br/>qui enchaine automatiquement les actions
+        Note over Joueur: Le bouton unique "🎯" enchaîne automatiquement<br/>les actions selon l'état (Propagation / J1-J2 / Nouveau tour)
     end
 
     Note over Joueur,PressePapier: ════════════ PHASE 4 : FIN DE PARTIE ════════════

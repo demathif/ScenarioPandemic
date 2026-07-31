@@ -20,11 +20,16 @@ var joueurActif = 1;
 
 /** Suivi des propagations */
 var nbEpidemiesTombees = 0;
-var cubesParVille = {};
 var cartesPropagationTirees = [];
 
 /** Noms des épidémies dans l'ordre où elles sont rencontrées */
 var epidemiesNom = [];
+
+/** Paramètres de la requête (URL) */
+var vars = {};
+
+/** Identifiant unique de la partie */
+var idUnique = 0;
 
 /** Retourne la couleur de la carte */
 function getCouleur(carte){
@@ -80,16 +85,16 @@ function miseEnPlaceJoueur(idJoueur) {
 /** Fonction principale */
 function run () {
 	// S'il existe des paramètres dans la requête, on s'en sert
-	var vars = {};
+	vars = {};
 	vars['roleJoueur1'] = "";
 	vars['roleJoueur2'] = "";
 	vars['paquetJoueur'] = "";
 	vars['paquetPropagationEntier'] = "";
 	vars['pseudos'] = "";
 	vars['idUnique'] = "";
-	var idUnique = 0;
+	idUnique = 0;
 
-	window.location.href.replace(location.hash, '').replace( 
+	window.location.href.replace(location.hash, '').replace(
 		/[?&]+([^=&]+)=?([^&]*)?/gi, // regexp
 		function( m, key, value ) { // callback
 			vars[key] = value !== undefined ? value : '';
@@ -100,17 +105,143 @@ function run () {
 		idUnique = vars['idUnique'];
 	}
 
-	// Si les rôles sont passés en paramètre, on les prend
+	// Rejouer un scénario partagé (rôles dans l'URL) → lancement direct
 	if(vars['roleJoueur1'].length >= 1 && vars['roleJoueur2'].length >= 1) {
 		rolesShuffle[0] = decodeURI(vars['roleJoueur1']);
 		rolesShuffle[1] = decodeURI(vars['roleJoueur2']);
+		afficherJeu();
+		initialiserPartie();
 	}
-	// Sinon, on mélange les rôles existants
+	// Nouvelle partie → écran de sélection des personnages
 	else {
-		rolesShuffle = roles.slice();
-		shuffle(rolesShuffle);
+		afficherSelection();
+	}
+}
+
+
+/** Affiche l'écran de sélection et génère la grille des personnages */
+function afficherSelection() {
+	document.getElementById('idViewJeu').style.display = "none";
+	var sel = document.getElementById('idViewSelection');
+	if (sel) sel.style.display = "block";
+	// Sur la sélection, le menu ☰ ne propose que "À propos" (ni lien, ni actions de jeu)
+	document.querySelectorAll('.menu-item').forEach(function(el) { el.style.display = "none"; });
+	document.querySelectorAll('.menu-jeu').forEach(function(el) { el.style.display = "none"; });
+	genererGrillePersonnages();
+}
+
+
+/** Affiche la vue de jeu */
+function afficherJeu() {
+	var sel = document.getElementById('idViewSelection');
+	if (sel) sel.style.display = "none";
+	document.getElementById('idViewJeu').style.display = "block";
+	// En jeu, le menu ☰ affiche le lien + les actions de jeu
+	document.querySelectorAll('.menu-item').forEach(function(el) { el.style.display = ""; });
+	document.querySelectorAll('.menu-jeu').forEach(function(el) { el.style.display = ""; });
+}
+
+
+/** Génère la grille des personnages (cases à cocher) */
+function genererGrillePersonnages() {
+	var myForm = document.getElementById("idBoxes");
+	if (!myForm) return;
+	var grid = document.createElement("div");
+	grid.className = "character-grid";
+
+	for (var i = 0; i < roles.length; i++) {
+		var card = document.createElement("div");
+		card.className = "character-card";
+
+		var checkBox = document.createElement("input");
+		checkBox.type = "checkbox";
+		checkBox.value = roles[i];
+		checkBox.id = "id" + i;
+		checkBox.className = "character-checkbox";
+
+		var label = document.createElement("label");
+		label.className = "character-label";
+		label.htmlFor = "id" + i;
+
+		var img = document.createElement("img");
+		img.src = "./../images/" + encodeURI(roles[i]) + ".png";
+		img.alt = roles[i];
+		img.title = descriptionsRole[roles[i]] || roles[i];
+		img.loading = "lazy";
+
+		var nameSpan = document.createElement("span");
+		nameSpan.className = "character-name";
+		nameSpan.textContent = roles[i];
+
+		var selectedBadge = document.createElement("span");
+		selectedBadge.className = "character-selected-badge";
+		selectedBadge.textContent = "✓";
+
+		label.appendChild(img);
+		label.appendChild(nameSpan);
+		card.appendChild(checkBox);
+		card.appendChild(label);
+		card.appendChild(selectedBadge);
+		grid.appendChild(card);
 	}
 
+	// Bouton Start : dernière cellule de la grille (taille d'une carte personnage)
+	var startBtn = document.createElement("button");
+	startBtn.type = "button";
+	startBtn.className = "btn-start";
+	startBtn.innerHTML = '<span class="btn-start-icon">▶</span><span class="btn-start-text">Commencer</span>';
+	startBtn.onclick = function() { get_roles(myForm); };
+	grid.appendChild(startBtn);
+
+	myForm.appendChild(grid);
+}
+
+
+/** onclick du bouton Start : récupère les rôles choisis ou les tire au hasard */
+function get_roles (form) {
+	var count = 0;
+	var choice = [];
+	var limit = 2; // FIXME: what if more that 2 players
+
+	var checkboxes = form.querySelectorAll('input[type="checkbox"]');
+	for (var i = 0; i < checkboxes.length; i++) {
+		if (checkboxes[i].checked) {
+			if (count < limit) {
+				choice[count] = checkboxes[i].value;
+				count++;
+			} else if (count >= limit) {
+				alert("Vous ne pouvez pas choisir plus de " + limit + " personnages");
+				return;
+			}
+		}
+	}
+	if (count != limit) { // some roles would be random
+		var roles_copy = roles.slice();
+		for (var k = 0; k < limit; k++) {
+			roles_copy = roles_copy.filter(function(e) { return e !== choice[k]; });
+		}
+		shuffle(roles_copy);
+		for (var j = 0; j < limit - count; j++) {
+			choice[limit - j - 1] = roles_copy[j];
+		}
+	}
+
+	shuffle(choice);
+	demarrerPartie(choice[0], choice[1]);
+}
+
+
+/** Démarre la partie avec les rôles choisis (même page, sans redirection) */
+function demarrerPartie(role1, role2) {
+	rolesShuffle[0] = role1;
+	rolesShuffle[1] = role2;
+	afficherJeu();
+	initialiserPartie();
+}
+
+
+/** Initialise la partie (paquets, pseudos, lien, mise en place des joueurs) */
+function initialiserPartie() {
 	// Si le paquetJoueur est passé en paramètre, on le prend
 	if(vars['paquetJoueur'].length >= 1) {
 		paquetJoueur = decodeURI(vars['paquetJoueur']).split('*');
@@ -170,11 +301,11 @@ function run () {
 
 		// On n'affiche pas dans l'ordre les joueurs qui ont joués, pour ne pas influencer
 		shuffle(joueurs);
-		alert("Nombre de personnes ayant joué ce scénario (" + idUnique + ") : " +pseudos.length + "\n - " + joueurs.join("\n - "));
+		afficherToast("Nombre de personnes ayant joué ce scénario (" + idUnique + ") : " + pseudos.length + " — " + joueurs.join(" · "));
 	}
 	else {
 		idUnique = Date.now();
-		alert("Vous êtes le 1er à jouer ce scénario (" + idUnique + ").\n\"Bon chance !\"");
+		afficherToast("Vous êtes le 1er à jouer ce scénario (" + idUnique + "). Bon chance !");
 	}
 
 
@@ -585,8 +716,6 @@ function tournePropogation(){
 	if (carte.charAt(0) == carte.charAt(2)) {
 		var joueur = (paquetJoueur.length + 1) % 4 == 0 ? 1 : 2;
 		document.getElementById('idTournePropagation').disabled = true;
-		document.getElementById('idOneClick').disabled = true;
-		document.getElementById('idOneClick').innerHTML = document.getElementById('idButtonCarte1').innerHTML;
 		document.getElementById('idGoJoueur').innerHTML = "Tour : " + document.getElementById('idJoueur' + joueur + 'Role').innerHTML;
 		document.getElementById('idGoJoueur').className = "goJoueur";
 		surlignerJoueur(joueur);
@@ -607,16 +736,6 @@ function surlignerJoueur(numJoueur) {
 		joueur1.classList.toggle('joueur-actif', numJoueur === 1);
 		joueur2.classList.toggle('joueur-actif', numJoueur === 2);
 	}
-}
-
-
-/** Réaffiche le tour en cours */
-function reAfficher() {
-	document.getElementById('idButtonCarte1').disabled = true;
-	document.getElementById('idCarte1').style.display = "block";
-	document.getElementById('idCarte2').style.display = "block";
-	document.getElementById('idCartesPropagation').style.display = "block";
-	document.getElementById('idDivCartesPropagation').className = 'enCours cartePropagation';
 }
 
 
@@ -741,6 +860,22 @@ function toggleInfo() {
 	}
 }
 
+
+/** Affiche une notification temporaire (toast) qui disparaît d'elle-même */
+var toastTimer = null;
+function afficherToast(message) {
+	var toast = document.getElementById('idToast');
+	if (!toast) return;
+	toast.textContent = message;
+	toast.style.display = "block";
+	toast.style.opacity = "1";
+	if (toastTimer) clearTimeout(toastTimer);
+	toastTimer = setTimeout(function() {
+		toast.style.opacity = "0";
+		setTimeout(function() { toast.style.display = "none"; }, 300);
+	}, 4000);
+}
+
 /** */
 function nouvellePartie() {
 	if(confirm("Voulez-vous démarrer une nouvelle partie ?")) {
@@ -751,31 +886,6 @@ function nouvellePartie() {
 /** Permet de rendre visible quelques données de débugage */
 function debug() {
 	document.getElementById('idDivDebug').style.display = document.getElementById('idDebug').checked ? "block" : "none";
-}
-
-
-/** Rend actif le bouton oneClick */
-function rendVisibleOneClick() {
-	document.getElementById('idOneClick').disabled = false;
-}
-
-
-/** Bouton unique pour gagner du temps :) */
-function oneClick() {
-	if (document.getElementById('idButtonCarte2').style.display == "block") {
-		tirerCartes('idCarte2');
-		document.getElementById('idOneClick').innerHTML = document.getElementById('idTournePropagation').innerHTML;
-	}
-	else if (document.getElementById('idTournePropagation').disabled == false) {
-		tournePropogation();
-	}
-	else if (document.getElementById('idGoJoueur').className == "goJoueur") {
-		nouveauTour();
-	}
-	else if (document.getElementById('idButtonCarte1').style.display == "block") {
-		tirerCartes('idCarte1');
-		document.getElementById('idOneClick').innerHTML = document.getElementById('idButtonCarte2').innerHTML;
-	}
 }
 
 

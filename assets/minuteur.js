@@ -41,12 +41,6 @@ function runTimer() {
   }, 1000);
 }
 
-// Démarrer le minuteur (depuis le temps initial choisi)
-function startTimer() {
-  resetTimer(); // toujours repartir de la valeur initiale
-  runTimer();
-}
-
 // Démarrer le minuteur avec une durée précise (secondes)
 function startTimerDuree(seconds) {
   pauseTimer();
@@ -98,11 +92,6 @@ function resetTimer() {
   remainingTime = timerDuration;
   updateDisplay();
 }
-
-// Quand on change de durée (radio)
-document.querySelectorAll('input[name="duration"]').forEach(radio => {
-  radio.addEventListener('change', resetTimer);
-});
 
 // Initialisation
 resetTimer();

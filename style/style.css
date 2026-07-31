@@ -170,6 +170,80 @@ header {
   text-align: center;
 }
 
+/* ---- Lien dans le menu ☰ ---- */
+.menu-item {
+  display: block;
+  color: var(--color-primary);
+  text-decoration: none;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius-sm);
+  font-weight: 500;
+}
+.menu-item:hover {
+  background-color: var(--color-bg);
+  color: var(--color-accent);
+}
+
+/* ---- Notification temporaire (toast) ---- */
+.toast {
+  position: fixed;
+  bottom: var(--spacing-lg);
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 90%;
+  background-color: var(--color-primary);
+  color: white;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-lg);
+  font-size: var(--font-size-base);
+  z-index: 200;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+  text-align: center;
+}
+
+/* ---- Écran de sélection des personnages ---- */
+.selection-intro {
+  text-align: center;
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+/* Bouton Start : occupe une cellule de la grille (taille d'une carte personnage) */
+.btn-start {
+  background: linear-gradient(135deg, #16a085, #1abc9c);
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: none;
+  min-height: 120px;
+  box-shadow: inset 0 -4px 0 rgba(0,0,0,0.15);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.btn-start-icon {
+  font-size: 2rem;
+  line-height: 1;
+}
+.btn-start-text {
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.btn-start:hover {
+  transform: translateY(-2px);
+  box-shadow: inset 0 -4px 0 rgba(0,0,0,0.15), 0 6px 14px rgba(22, 160, 133, 0.45);
+}
+
 footer {
   width: 100%;
   max-width: 1200px;
@@ -868,35 +942,32 @@ button.secondary {
   }
 }
 
-/* ---- Grille de sélection des personnages (index.html) ---- */
+/* ---- Grille de sélection des personnages (galerie) ---- */
 .character-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  gap: var(--spacing-xs);
-  max-width: 900px;
-  margin: var(--spacing-md) auto;
-  padding: 0 var(--spacing-sm);
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 0;
+  max-width: 960px;
+  margin: var(--spacing-sm) auto;
+  padding: 0;
 }
 
 .character-card {
   position: relative;
-  background: var(--color-surface);
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow-sm);
+  background: transparent;
+  border-radius: 2px;
   overflow: hidden;
-  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
-  border: 3px solid transparent;
+  transition: transform 0.15s;
   cursor: pointer;
 }
 
 .character-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
 }
 
 .character-card:has(.character-checkbox:checked) {
-  border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.3), var(--shadow-md);
+  outline: 3px solid var(--color-accent);
+  outline-offset: -3px;
 }
 
 .character-checkbox {
@@ -911,32 +982,27 @@ button.secondary {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: var(--spacing-xs);
+  padding: 0;
   cursor: pointer;
-  gap: var(--spacing-xs);
+  gap: 2px;
 }
 
 .character-label img {
   width: 100%;
-  max-width: 80px;
   height: auto;
   aspect-ratio: 160 / 200;
-  object-fit: contain;
-  border-radius: var(--border-radius-sm);
+  object-fit: cover;
+  border-radius: 2px;
   background-color: var(--color-bg);
-  transition: transform 0.2s;
-}
-
-.character-card:hover .character-label img {
-  transform: scale(1.05);
 }
 
 .character-name {
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-sm);
   font-weight: 600;
   text-align: center;
   color: var(--color-primary);
-  line-height: 1.3;
+  line-height: 1.2;
+  padding: 2px 0;
 }
 
 /* Badge "✓" qui apparaît quand sélectionné */
@@ -967,13 +1033,9 @@ button.secondary {
 
 @media (max-width: 768px) {
   .character-grid {
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: var(--spacing-sm);
-    padding: 0 var(--spacing-sm);
-  }
-
-  .character-label img {
-    max-width: 120px;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 0;
+    padding: 0;
   }
 
   .character-name {
@@ -983,15 +1045,15 @@ button.secondary {
 
 @media (max-width: 480px) {
   .character-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--spacing-xs);
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
   }
 
   .character-label {
-    padding: var(--spacing-sm);
+    padding: 0;
   }
 
   .character-label img {
-    max-width: 90px;
+    max-width: 100%;
   }
 }
