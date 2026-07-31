@@ -66,10 +66,6 @@ body {
   font-size: var(--font-size-base);
   color: var(--color-text);
   background-color: var(--color-bg);
-  background-image: url("../images/survival.png");
-  background-repeat: no-repeat;
-  background-position: top right;
-  background-size: 64px;
   min-height: 100vh;
 }
 
@@ -547,6 +543,53 @@ button.secondary {
   background-color: var(--color-surface);
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-sm);
+}
+
+/* ---- Section "Partie terminée" modernisée ---- */
+.fin-partie-header {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.fin-partie-header strong {
+  font-size: var(--font-size-lg);
+  color: var(--color-primary);
+}
+
+.fin-partie-sub {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-light);
+}
+
+.fin-partie-corps {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.fin-partie-corps label {
+  margin-right: 0;
+}
+
+.fin-pseudo input {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+}
+
+.fin-resultat {
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.btn-save {
+  font-weight: 700;
 }
 
 .section-action label {

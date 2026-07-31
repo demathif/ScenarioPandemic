@@ -664,6 +664,12 @@ function partieTerminee(){
 	var gagnePerdue = -1 ;
 	var ps = document.getElementById('idPseudo').value;
 
+	// Si rien n'est rempli (pas de pseudo ni de résultat) → on copie juste le lien
+	if (ps == "" && !document.getElementById('idGagne').checked && !document.getElementById('idPerdu').checked) {
+		genererLienPartie();
+		return;
+	}
+
 	// Si le pseudo n'est pas rempli
 	if(ps == "") {
 		alert("Vous devez saisir un pseudo");
@@ -699,9 +705,10 @@ function partieTerminee(){
 
 /** Génère le lien de la partie */
 function genererLienPartie() {
-	// On génère le lien à la demande si on souhaite rentrer plusieurs pseudos en cours de parties
-	document.getElementById('idLienPartie').href = lienSansPseudo + "&pseudos=" + pseudos.join('*');
-	navigator.clipboard.writeText(lienSansPseudo + "&pseudos=" + pseudos.join('*'))
+	// Lien sans pseudo si aucun joueur n'a encore été enregistré
+	var lien = pseudos.length > 0 ? lienSansPseudo + "&pseudos=" + pseudos.join('*') : lienSansPseudo;
+	document.getElementById('idLienPartie').href = lien;
+	navigator.clipboard.writeText(lien)
       .then(() => {
         alert("Lien copié !");
       })
