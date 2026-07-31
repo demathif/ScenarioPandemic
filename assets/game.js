@@ -717,6 +717,30 @@ function genererLienPartie() {
       });
 }
 
+/** Ouvre / ferme le menu secondaire (☰) */
+function toggleMenu() {
+	var menu = document.getElementById('idMenuSecondaire');
+	if (menu) {
+		menu.style.display = menu.style.display == "block" ? "none" : "block";
+	}
+}
+
+/** Affiche / masque le formulaire de fin de partie */
+function toggleFinPartie() {
+	var fp = document.getElementById('idFinPartie');
+	if (fp) {
+		fp.style.display = fp.style.display == "block" ? "none" : "block";
+	}
+}
+
+/** Affiche / masque le panneau "À propos" (version / auteurs) */
+function toggleInfo() {
+	var info = document.getElementById('idInfo');
+	if (info) {
+		info.style.display = info.style.display == "block" ? "none" : "block";
+	}
+}
+
 /** */
 function nouvellePartie() {
 	if(confirm("Voulez-vous démarrer une nouvelle partie ?")) {
