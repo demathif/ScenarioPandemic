@@ -727,6 +727,11 @@ function oneClick() {
 }
 
 
+/** Retourne la durée du chrono pour le tour courant (2 min tour 1, 1 min 20 ensuite) */
+function dureeChronoTour() {
+	return nbTours <= 1 ? 120 : 80;
+}
+
 /** Met à jour l'état (activé/désactivé) ET le libellé du bouton unique */
 function mettreAJourBoutonUnique() {
 	var btn = document.getElementById('idBoutonUnique');
@@ -734,11 +739,21 @@ function mettreAJourBoutonUnique() {
 	var actif = false;
 	var label = "⏸ Attente";
 
+	// Menu de pause ouvert → le bouton principal est inactif (on utilise le menu)
+	if (document.getElementById('idMenuChrono').style.display == "block") {
+		actif = false;
+		label = "⏸ En pause";
+	}
+	// Chrono en cours → le bouton affiche le décompte et sert à mettre en pause
+	else if (isTimerRunning()) {
+		actif = true;
+		label = "⏸ " + getTempsFormate();
+	}
 	// IMPORTANT : vérifier les états des boutons AVANT le statut goJoueur,
 	// car goJoueur est remis à "" après la 1ère carte joueur.
 
 	// Tirer la 2nde carte joueur (bouton 2 visible)
-	if (document.getElementById('idButtonCarte2').style.display == "block") {
+	else if (document.getElementById('idButtonCarte2').style.display == "block") {
 		actif = true;
 		label = "J" + joueurActif;
 	}
@@ -769,6 +784,14 @@ function boutonUnique() {
 	var btn = document.getElementById('idBoutonUnique');
 	if (btn.disabled) return;
 
+	// Chrono en cours → un clic met en pause et affiche le menu
+	if (isTimerRunning()) {
+		pauseTimer();
+		document.getElementById('idMenuChrono').style.display = "block";
+		mettreAJourBoutonUnique();
+		return;
+	}
+
 	// Tirer la 2nde carte joueur (bouton 2 visible)
 	if (document.getElementById('idButtonCarte2').style.display == "block") {
 		tirerCartes('idCarte2');
@@ -782,11 +805,31 @@ function boutonUnique() {
 			 document.getElementById('idButtonCarte1').style.display != "none") {
 		tirerCartes('idCarte1');
 	}
-	// Nouveau tour à démarrer
+	// Nouveau tour : démarre le tour ET lance le chrono
 	else if (document.getElementById('idGoJoueur').className == "goJoueur") {
 		nouveauTour();
+		startTimerDuree(dureeChronoTour());
 	}
 
+	mettreAJourBoutonUnique();
+}
+
+
+/** Gère le choix dans le menu pause du chrono */
+function choixChrono(choix) {
+	document.getElementById('idMenuChrono').style.display = "none";
+	if (choix == 'reset') {
+		// Repartir du temps initial du tour courant
+		startTimerDuree(dureeChronoTour());
+	}
+	else if (choix == 'reprise') {
+		// Reprendre le décompte là où il en était
+		resumeTimer();
+	}
+	else if (choix == 'stop' || choix == 'continue') {
+		// Fin du chrono → on permet le tirage suivant
+		stopTimer();
+	}
 	mettreAJourBoutonUnique();
 }
 

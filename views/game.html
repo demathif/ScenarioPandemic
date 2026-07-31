@@ -5,9 +5,9 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link rel="icon" href="../images/survival.ico" />
-		<link rel="stylesheet" href="../style/style.css?v=6">
-		<script type="text/javascript" src="../assets/cards.js?v=6"></script>
-		<script type="text/javascript" src="../assets/game.js?v=6"></script>
+		<link rel="stylesheet" href="../style/style.css?v=8">
+		<script type="text/javascript" src="../assets/cards.js?v=8"></script>
+		<script type="text/javascript" src="../assets/game.js?v=8"></script>
 	</head>
 	
 	<body onload="run();">
@@ -17,6 +17,16 @@
 
 		<div class="boutons-ligne boutons-auto">
 			<button onclick="boutonUnique()" id="idBoutonUnique" class="primary bouton-unique">🎯 Tirer (auto)</button>
+		</div>
+
+		<!-- Menu pause du chrono (affiché quand on clique sur le bouton unique pendant le décompte) -->
+		<div id="idMenuChrono" class="chrono-menu" style="display:none;">
+			<span class="chrono-menu-title">Chrono en pause</span>
+			<div class="chrono-menu-buttons">
+				<button onclick="choixChrono('reset')" class="secondary">🔄 Reset</button>
+				<button onclick="choixChrono('reprise')" class="secondary">⏯️ Reprise</button>
+				<button onclick="choixChrono('stop')" class="primary">⏹️ Stop</button>
+			</div>
 		</div>
 
 		<div id="idCartesJoueurs" class="players-row">
@@ -79,7 +89,7 @@
 		</div>
 
 		<!-- Chronomètre -->
-		<div class="chrono" onmouseover="nouveauTour();" onmouseout="rendVisibleOneClick()">
+		<div class="chrono" onmouseout="rendVisibleOneClick()">
 			<div class="chrono-options">
 				<label><input type="radio" name="duration" value="120" checked> Tour 1 (120s)</label>
 				<label><input type="radio" name="duration" value="80"> Tours suivants (80s)</label>
@@ -164,6 +174,6 @@
 			Authors : Potaw (CDM 2019 avec Yo) et Fk (sparring de la CDM 2019)
 		</footer>
 		
-		<script type="text/javascript" src="../assets/minuteur.js?v=6"></script>
+		<script type="text/javascript" src="../assets/minuteur.js?v=8"></script>
 	</body>
 </html>

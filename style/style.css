@@ -433,6 +433,33 @@ button.secondary {
   min-width: 260px;
 }
 
+/* ---- Menu pause du chrono ---- */
+.chrono-menu {
+  max-width: 1200px;
+  margin: 0 auto var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: #fff8e1;
+  border-radius: var(--border-radius);
+  border-left: 4px solid #f39c12;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.chrono-menu-title {
+  font-weight: 700;
+  color: #b7791f;
+}
+
+.chrono-menu-buttons {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
 /* ---- "Tour : [Rôle]" ---- */
 .goJoueur {
   display: inline-block;
