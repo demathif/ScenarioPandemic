@@ -190,6 +190,12 @@ footer {
   letter-spacing: 0.5px;
 }
 
+/* Dernière carte de propagation conservée au début d'un tour (grisée) */
+.propa-card-grisee {
+  opacity: 0.45;
+  filter: grayscale(80%);
+}
+
 .propa-card-ville {
   font-weight: 600;
 }
@@ -472,6 +478,25 @@ button.secondary {
   box-shadow: var(--shadow-sm);
 }
 
+/* "Tour..." : masqué (le joueur actif est indiqué par le cadre surligné) */
+#idGoJoueur {
+  display: none;
+}
+
+/* ---- Bouton copie de lien (discret, en haut à droite) ---- */
+.btn-copy {
+  position: fixed;
+  top: var(--spacing-sm);
+  right: var(--spacing-sm);
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  font-size: var(--font-size-lg);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-md);
+  z-index: 100;
+}
+
 /* ---- Chronomètre ---- */
 .chrono {
   max-width: 1200px;
@@ -663,11 +688,11 @@ button.secondary {
 /* ---- Grille de sélection des personnages (index.html) ---- */
 .character-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: var(--spacing-md);
-  max-width: 1200px;
-  margin: var(--spacing-lg) auto;
-  padding: 0 var(--spacing-md);
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: var(--spacing-xs);
+  max-width: 900px;
+  margin: var(--spacing-md) auto;
+  padding: 0 var(--spacing-sm);
 }
 
 .character-card {
@@ -703,14 +728,14 @@ button.secondary {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: var(--spacing-md);
+  padding: var(--spacing-xs);
   cursor: pointer;
-  gap: var(--spacing-sm);
+  gap: var(--spacing-xs);
 }
 
 .character-label img {
   width: 100%;
-  max-width: 160px;
+  max-width: 80px;
   height: auto;
   aspect-ratio: 160 / 200;
   object-fit: contain;

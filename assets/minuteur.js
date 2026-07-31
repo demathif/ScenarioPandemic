@@ -17,7 +17,9 @@ function getTempsFormate() {
 // Mettre à jour l'affichage du temps
 function updateDisplay() {
   const txt = getTempsFormate();
-  document.getElementById("timer").textContent = txt;
+  // Affichage legacy (peut ne plus exister) : on protège
+  const timerEl = document.getElementById("timer");
+  if (timerEl) timerEl.textContent = txt;
   // Affiche aussi le décompte dans le bouton unique quand le chrono tourne
   const btn = document.getElementById('idBoutonUnique');
   if (btn && isTimerRunning()) {

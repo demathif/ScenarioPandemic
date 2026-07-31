@@ -634,6 +634,10 @@ function nouveauTour() {
 		for (var i = 0; i < cartesProp.length - 1; i++) {
 			cartesProp[i].remove();
 		}
+		// Grise la dernière carte conservée pour la différencier des nouvelles
+		if (cartesProp.length > 0) {
+			cartesProp[cartesProp.length - 1].classList.add('propa-card-grisee');
+		}
 		if (isChronoDejaTourne == false) {
 			isChronoDejaTourne = true;
 			nbTours++;
