@@ -456,12 +456,6 @@ footer {
   margin-bottom: var(--spacing-sm);
 }
 
-.joueur-titre {
-  font-size: var(--font-size-lg);
-  font-weight: 700;
-  color: var(--color-primary);
-}
-
 .joueur-role {
   font-size: var(--font-size-base);
   color: var(--color-text-light);
@@ -492,12 +486,12 @@ footer {
   border: 2px solid white;
 }
 
-/* Cartes du joueur */
+/* Cartes du joueur : liste en colonne à côté de la photo */
 .joueur-cartes {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-xs);
-  margin-top: var(--spacing-sm);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
 }
 
 .carte-joueur-item {
@@ -928,13 +922,14 @@ button.secondary {
     padding: var(--spacing-sm);
   }
 
+  /* Cadres joueurs compacts : photo à gauche, cartes en colonne à droite */
   .joueur {
-    flex-direction: column;
-    align-items: center;
+    gap: var(--spacing-sm);
   }
 
-  .joueur-contenu {
-    width: 100%;
+  .joueur-image img {
+    width: 70px;
+    height: auto;
   }
 
   #idSpoilHistoJoueurs table {
