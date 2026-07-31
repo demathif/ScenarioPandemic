@@ -15,6 +15,9 @@ var isChronoDejaTourne = false;
 /** Mapping rôle → numéro de joueur (1 ou 2) */
 var joueurDuRole = {};
 
+/** Joueur actif (1 ou 2) */
+var joueurActif = 1;
+
 /** Suivi des propagations */
 var nbEpidemiesTombees = 0;
 var cubesParVille = {};
@@ -52,7 +55,9 @@ function miseEnPlaceJoueur(idJoueur) {
 	var role = rolesShuffle.shift();
 	for (var i = 0; i <= 3; i++) {
 		carte = paquetJoueur.shift();
-		cartesHtml += "<span class='carte-joueur-item'><span class='carte-color' data-color='" + getCouleur(carte) + "'>" + carte + "</span></span>";
+		var descEvt = descriptionsEvenement[carte];
+		cartesHtml += "<span class='carte-joueur-item'><span class='carte-color' data-color='" + getCouleur(carte) + "'" +
+			(descEvt ? ' title="' + descEvt + '"' : "") + ">" + carte + "</span></span>";
 	}
 	document.getElementById(idJoueur + 'Cartes').innerHTML = cartesHtml;
 	document.getElementById(idJoueur + 'Role').innerHTML = role;
@@ -229,8 +234,21 @@ function tirerCartes(idCarte) {
 
 	// On prend la prochaine carte du paquet
 	var carte = paquetJoueur.shift();
-	document.getElementById(idCarte).innerHTML = "<span class='carte-color' data-color='" + getCouleur(carte) + "'>" + carte + "</span>";
+	// Si c'est une carte événement, on affiche sa description au survol
+	var descEvt = descriptionsEvenement[carte];
+	var htmlCarte = "<span class='carte-color' data-color='" + getCouleur(carte) + "'" +
+		(descEvt ? ' title="' + descEvt + '"' : "") + ">" + carte + "</span>";
+	document.getElementById(idCarte).innerHTML = htmlCarte;
 	document.getElementById('idRecap').innerHTML += carte + "<br />";
+
+	// Ajouter la carte dans la zone du joueur actif (suite des 4 premières)
+	var cartesContainer = document.getElementById('idJoueur' + joueurActif + 'Cartes');
+	if (cartesContainer) {
+		var carteEl = document.createElement('span');
+		carteEl.className = 'carte-joueur-item';
+		carteEl.innerHTML = htmlCarte;
+		cartesContainer.appendChild(carteEl);
+	}
 }
 
 
@@ -565,6 +583,7 @@ function tournePropogation(){
 
 /** Met en surbrillance le joueur actif et grise l'autre */
 function surlignerJoueur(numJoueur) {
+	joueurActif = numJoueur;
 	var joueur1 = document.getElementById('idJoueur1');
 	var joueur2 = document.getElementById('idJoueur2');
 	if (joueur1 && joueur2) {

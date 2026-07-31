@@ -4,6 +4,18 @@ const jaune = ['Los Angeles', 'Mexico', 'Miami', 'Bogota', 'Lima', 'Santiago', '
 const noir = ['Alger', 'Le Caire', 'Istanbul', 'Moscou', 'Téhéran', 'Bagdad', 'Riyad', 'Karachi', 'Delhi', 'Mumbai', 'Calcutta', 'Chennai'];
 const rouge = ['Jakarta', 'Sydney', 'Manille', 'Ho Chi Minh Ville', 'Bangkok', 'Hong Kong', 'Taipei', 'Osaka', 'Tokyo', 'Shanghai', 'Pékin', 'Séoul'];
 const evenements = ['Pont aérien', 'Subvention publique', 'Hôpital mobile', 'Rééxaminer les recherches', 'Traitements à distance', 'Ordres spéciaux', 'Temps emprunté', 'Déploiement de vaccins rapides'];
+
+/** Description de chaque carte événement */
+const descriptionsEvenement = {
+	'Pont aérien': '📦 Jeu de Base — Déplacez 1 pion (le vôtre ou celui d\'un autre joueur) vers n\'importe quelle ville du plateau.',
+	'Subvention publique': '📦 Jeu de Base — Ajoutez 1 station de recherche dans n\'importe quelle ville, sans avoir à défausser de carte Ville.',
+	'Traitements à distance': '📦 Jeu de Base — Retirez immédiatement 1 cube Maladie de n\'importe quelle ville du plateau, peu importe où se trouvent les pions des joueurs.',
+	'Hôpital mobile': '☣️ Au Seuil de la Catastrophe — Ce tour-ci, retirez 1 cube Maladie de chaque ville dans laquelle votre pion entre. Note : le déplacement en lui-même coûte toujours ses actions/cartes normales.',
+	'Rééxaminer les recherches': '☣️ Au Seuil de la Catastrophe — Choisissez et prenez 1 carte Ville de votre choix directement depuis la défausse des Joueurs pour l\'ajouter à votre main.',
+	'Ordres spéciaux': '☣️ Au Seuil de la Catastrophe — Durant votre tour, vous pouvez déplacer le pion d\'un autre joueur comme s\'il s\'agissait du vôtre.',
+	'Temps emprunté': '☣️ Au Seuil de la Catastrophe — Le joueur actif gagne immédiatement 2 actions supplémentaires à utiliser lors de son tour actuel.',
+	'Déploiement de vaccins rapides': '☣️ Au Seuil de la Catastrophe — Permet de traiter instantanément et gratuitement des cubes de maladies spécifiques dans plusieurs villes ou de faciliter les futurs traitements.',
+};
 const epidemies = ['Pente fatale', 'Structure moléculaire complexe', 'Pertes inacceptables', 'Effet chronique', 'Ingérence gouvernementale', 'Populations non calculées'];
 
 /** Description de chaque épidémie */
