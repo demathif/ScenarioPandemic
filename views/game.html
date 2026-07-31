@@ -5,14 +5,14 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link rel="icon" href="../images/survival.ico" />
-		<link rel="stylesheet" href="../style/style.css?v=27">
-		<script type="text/javascript" src="../assets/cards.js?v=27"></script>
-		<script type="text/javascript" src="../assets/game.js?v=27"></script>
+		<link rel="stylesheet" href="../style/style.css?v=30">
+		<script type="text/javascript" src="../assets/cards.js?v=30"></script>
+		<script type="text/javascript" src="../assets/game.js?v=30"></script>
 	</head>
 	
 	<body onload="run();">
 		<header class="topbar">
-			<span class="topbar-title">🦠 Scénario Pandemic</span>
+			<span class="topbar-title">🦠 Scénario Pandemic (version Coupe du Monde)</span>
 			<button class="topbar-menu" onclick="toggleMenu()" title="Menu">☰</button>
 		</header>
 
@@ -47,6 +47,47 @@
 
 		<!-- ═══════ VUE JEU ═══════ -->
 		<div id="idViewJeu" style="display:none;">
+
+		<!-- Formulaire de fin de partie (sous le menu) --><div class="section-action fin-partie" id="idFinPartie" style="display:none;">
+			<div class="fin-partie-header">
+				<strong>🏁 Partie terminée</strong>
+				<span class="fin-partie-sub">Saisissez votre résultat puis enregistrez</span>
+			</div>
+			<div class="fin-partie-corps">
+				<label class="fin-pseudo">Pseudo :
+					<input id="idPseudo" type="text" size="8" placeholder="a-zA-Z0-9">
+				</label>
+				<label class="fin-resultat"><input type="radio" name="radioPartieTerminee" id="idGagne" onClick="remplirChampsFinPartie(1)"> 🏆 Gagnée</label>
+				<label class="fin-resultat"><input type="radio" name="radioPartieTerminee" id="idPerdu" onClick="remplirChampsFinPartie(0)"> 💀 Perdue</label>
+				<div id="idNbRemedesEclosions" style="display: none;">
+					<label>Remèdes :
+						<select id="idNbRemedes">
+							<option value="0">0</option>
+							<option value="1">1</option>
+							<option value="2">2</option>
+							<option value="3">3</option>
+							<option value="4">4</option>
+						</select>
+					</label>
+					<label>Éclosions :
+						<select id="idNbEclosions">
+							<option value="0">0</option>
+							<option value="1">1</option>
+							<option value="2">2</option>
+							<option value="3">3</option>
+							<option value="4">4</option>
+							<option value="5">5</option>
+							<option value="6">6</option>
+							<option value="7">7</option>
+							<option value="8">8</option>
+						</select>
+					</label>
+				</div>
+				<button onclick="partieTerminee()" class="primary btn-save" title="Copier le lien de la partie (ou sauvegarder le résultat si rempli)">📋 Copier le lien</button>
+			</div>
+		</div>
+
+		
 
 		<div class="boutons-ligne boutons-auto">
 			<button onclick="boutonUnique()" id="idBoutonUnique" class="bouton-unique">🎯 Tirer (auto)</button>
@@ -133,45 +174,6 @@
 			<source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACAf39/f4B/f3+AgH9/f3+Af39/gIB/f39/gH9/f4CAf39/f4B/f3+AgH9/f3+Af39/gIB/f39/gH9/f4B/f3+AgH9/f4B/f3+AgH9/f3+Af39/gIB/f39/gIB/f3+Af39/gIB/f3+AgH9/f3+Af39/gIB/f3+Af39/gIB/f3+AgH9/f3+Af39/gIB/f39/gIB/f3+Af39/gIB/f39/gIB/f3+Af39/gIB/f3+AgH9/f3+Af39/gIB/f3+AgH9/gIB/f3+Af39/gIB/f39/gIB/f3+Af39/gIB/f39/gH9/f4CAf39/gH9/f4B/f3+Af39/gH9/f4B/f3+Af39/gIB/f3+Af39/gIB/f39/gH9/f4B/f3+AgH9/f4B/f3+AgH9/f4B/f3+Af39/gIB/f39/gH9/f4B/f3+Af39/gH9/f4B/f39/gIB/f3+Af39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gIB/f3+Af39/gH9/f4B/f39/gH9/f4B/f39/gIB/f3+Af39/gIB/f39/gH9/f4B/f3+Af39/gH9/f4B/f3+AgH9/f4B/f3+Af39/gH9/f4B/f3+Af39/gH9/f4B/f3+Af39/gH9/f4B/f3+Af39/gH9/f4CAf39/gH9/f4B/f3+Af39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39/gH9/f4B/f39"/>
 		</audio>
 
-		<div class="section-action fin-partie" id="idFinPartie" style="display:none;">
-			<div class="fin-partie-header">
-				<strong>🏁 Partie terminée</strong>
-				<span class="fin-partie-sub">Saisissez votre résultat puis enregistrez</span>
-			</div>
-			<div class="fin-partie-corps">
-				<label class="fin-pseudo">Pseudo :
-					<input id="idPseudo" type="text" size="8" placeholder="a-zA-Z0-9">
-				</label>
-				<label class="fin-resultat"><input type="radio" name="radioPartieTerminee" id="idGagne" onClick="remplirChampsFinPartie(1)"> 🏆 Gagnée</label>
-				<label class="fin-resultat"><input type="radio" name="radioPartieTerminee" id="idPerdu" onClick="remplirChampsFinPartie(0)"> 💀 Perdue</label>
-				<div id="idNbRemedesEclosions" style="display: none;">
-					<label>Remèdes :
-						<select id="idNbRemedes">
-							<option value="0">0</option>
-							<option value="1">1</option>
-							<option value="2">2</option>
-							<option value="3">3</option>
-							<option value="4">4</option>
-						</select>
-					</label>
-					<label>Éclosions :
-						<select id="idNbEclosions">
-							<option value="0">0</option>
-							<option value="1">1</option>
-							<option value="2">2</option>
-							<option value="3">3</option>
-							<option value="4">4</option>
-							<option value="5">5</option>
-							<option value="6">6</option>
-							<option value="7">7</option>
-							<option value="8">8</option>
-						</select>
-					</label>
-				</div>
-				<button onclick="partieTerminee()" class="primary btn-save" title="Copier le lien de la partie (ou sauvegarder le résultat si rempli)">📋 Copier le lien</button>
-			</div>
-		</div>
-
 		<div class="debug-section">
 			<div id="idDivDebug" style="display:none;">
 				<br />
@@ -191,6 +193,6 @@
 
 		</div><!-- /idViewJeu -->
 
-		<script type="text/javascript" src="../assets/minuteur.js?v=27"></script>
+		<script type="text/javascript" src="../assets/minuteur.js?v=30"></script>
 	</body>
 </html>
