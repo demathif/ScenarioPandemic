@@ -5,15 +5,19 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link rel="icon" href="../images/survival.ico" />
-		<link rel="stylesheet" href="../style/style.css">
-		<script type="text/javascript" src="../assets/cards.js?v=3"></script>
-		<script type="text/javascript" src="../assets/game.js?v=3"></script>
+		<link rel="stylesheet" href="../style/style.css?v=6">
+		<script type="text/javascript" src="../assets/cards.js?v=6"></script>
+		<script type="text/javascript" src="../assets/game.js?v=6"></script>
 	</head>
 	
 	<body onload="run();">
 		<header>
 			🎲 Scénario Pandemic
 		</header>
+
+		<div class="boutons-ligne boutons-auto">
+			<button onclick="boutonUnique()" id="idBoutonUnique" class="primary bouton-unique">🎯 Tirer (auto)</button>
+		</div>
 
 		<div id="idCartesJoueurs" class="players-row">
 			<div id="idJoueur1" class="joueur">
@@ -57,7 +61,7 @@
 			<div class="epidemic-cartes" id="idEpidemiesCartes"></div>
 		</div>
 
-		<div class="boutons-ligne">
+		<div class="boutons-ligne" id="idBoutonsLegacy">
 			<button id="idButtonCarte1" onclick="tirerCartes('idCarte1')" disabled>Tirer 1<sup>ère</sup> carte</button>
 			<button id="idButtonCarte2" onclick="tirerCartes('idCarte2')" style="display: none;">Tirer 2<sup>nde</sup> carte</button>
 			<button id="idTournePropagation" onclick="tournePropogation()" class="primary">Tirer carte propagation</button>
@@ -160,6 +164,6 @@
 			Authors : Potaw (CDM 2019 avec Yo) et Fk (sparring de la CDM 2019)
 		</footer>
 		
-		<script type="text/javascript" src="../assets/minuteur.js?v=3"></script>
+		<script type="text/javascript" src="../assets/minuteur.js?v=6"></script>
 	</body>
 </html>

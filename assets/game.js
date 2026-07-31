@@ -196,6 +196,9 @@ function run () {
 
 	// Initialisation du panneau propagation
 	initialiserPanelPropagation();
+
+	// État initial du bouton unique
+	mettreAJourBoutonUnique();
 }
 
 
@@ -249,6 +252,8 @@ function tirerCartes(idCarte) {
 		carteEl.innerHTML = htmlCarte;
 		cartesContainer.appendChild(carteEl);
 	}
+
+	mettreAJourBoutonUnique();
 }
 
 
@@ -578,6 +583,7 @@ function tournePropogation(){
 		mettreAJourCartesATirer();
 	}
 	isPseudoGagnePerduCeTour("P");
+mettreAJourBoutonUnique();
 }
 
 
@@ -617,6 +623,7 @@ function nouveauTour() {
 			document.getElementById('idRecap').innerHTML += "<b>Tour " + nbTours + " : " + document.getElementById('idGoJoueur').innerHTML + "</b><br />";
 		}
 	}
+	mettreAJourBoutonUnique();
 }
 
 /** Permet de saisir les champs de Nombres de remèdes et d'éclosions en fin de partie */
@@ -717,6 +724,70 @@ function oneClick() {
 		tirerCartes('idCarte1');
 		document.getElementById('idOneClick').innerHTML = document.getElementById('idButtonCarte2').innerHTML;
 	}
+}
+
+
+/** Met à jour l'état (activé/désactivé) ET le libellé du bouton unique */
+function mettreAJourBoutonUnique() {
+	var btn = document.getElementById('idBoutonUnique');
+	if (!btn) return;
+	var actif = false;
+	var label = "⏸ Attente";
+
+	// IMPORTANT : vérifier les états des boutons AVANT le statut goJoueur,
+	// car goJoueur est remis à "" après la 1ère carte joueur.
+
+	// Tirer la 2nde carte joueur (bouton 2 visible)
+	if (document.getElementById('idButtonCarte2').style.display == "block") {
+		actif = true;
+		label = "J" + joueurActif;
+	}
+	// Propagation (initiale OU d'un tour) : bouton propagation actif
+	else if (!document.getElementById('idTournePropagation').disabled) {
+		actif = true;
+		label = "🦠 Propagation";
+	}
+	// Tirer la 1ère carte joueur (bouton 1 actif)
+	else if (!document.getElementById('idButtonCarte1').disabled &&
+			 document.getElementById('idButtonCarte1').style.display != "none") {
+		actif = true;
+		label = "J" + joueurActif;
+	}
+	// Nouveau tour à démarrer ("Tour : [Rôle]" affiché, rien à tirer)
+	else if (document.getElementById('idGoJoueur').className == "goJoueur") {
+		actif = true;
+		label = "▶ Nouveau tour";
+	}
+
+	btn.disabled = !actif;
+	btn.innerHTML = label;
+}
+
+
+/** Bouton unique : tire automatiquement la bonne carte selon l'état du jeu */
+function boutonUnique() {
+	var btn = document.getElementById('idBoutonUnique');
+	if (btn.disabled) return;
+
+	// Tirer la 2nde carte joueur (bouton 2 visible)
+	if (document.getElementById('idButtonCarte2').style.display == "block") {
+		tirerCartes('idCarte2');
+	}
+	// Propagation (initiale OU d'un tour) : bouton propagation actif
+	else if (!document.getElementById('idTournePropagation').disabled) {
+		tournePropogation();
+	}
+	// Tirer la 1ère carte joueur (bouton 1 actif)
+	else if (!document.getElementById('idButtonCarte1').disabled &&
+			 document.getElementById('idButtonCarte1').style.display != "none") {
+		tirerCartes('idCarte1');
+	}
+	// Nouveau tour à démarrer
+	else if (document.getElementById('idGoJoueur').className == "goJoueur") {
+		nouveauTour();
+	}
+
+	mettreAJourBoutonUnique();
 }
 
 
