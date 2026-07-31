@@ -220,6 +220,11 @@ function tirerCartes(idCarte) {
 		document.getElementById('idCarte2').innerHTML = "...";
 		document.getElementById('idButtonCarte1').style.display = "none";
 		document.getElementById('idButtonCarte2').style.display = "block";
+		// Début de tour : on vide le cadre du joueur actif (les 4 initiales incluses)
+		var monContainer = document.getElementById('idJoueur' + joueurActif + 'Cartes');
+		if (monContainer) {
+			monContainer.innerHTML = "";
+		}
 	}
 	else {
 		document.getElementById('idButtonCarte1').style.display = "block";
@@ -245,6 +250,12 @@ function tirerCartes(idCarte) {
 	document.getElementById('idRecap').innerHTML += carte + "<br />";
 
 	// Ajouter la carte dans la zone du joueur actif (suite des 4 premières)
+	// Les cartes ne sont pas persistantes : on vide le cadre de l'autre joueur
+	var autreJoueur = joueurActif == 1 ? 2 : 1;
+	var autreContainer = document.getElementById('idJoueur' + autreJoueur + 'Cartes');
+	if (autreContainer) {
+		autreContainer.innerHTML = "";
+	}
 	var cartesContainer = document.getElementById('idJoueur' + joueurActif + 'Cartes');
 	if (cartesContainer) {
 		var carteEl = document.createElement('span');
@@ -617,6 +628,12 @@ function nouveauTour() {
 		document.getElementById('idCarte1').style.display = "none";
 		document.getElementById('idCarte2').style.display = "none";
 		document.getElementById('idCartesPropagation').style.display = "none";
+		// Début de tour : on ne garde que la dernière carte de propagation (le top deck)
+		var propContainer = document.getElementById('idPropagationCartes');
+		var cartesProp = propContainer.querySelectorAll('.propa-card');
+		for (var i = 0; i < cartesProp.length - 1; i++) {
+			cartesProp[i].remove();
+		}
 		if (isChronoDejaTourne == false) {
 			isChronoDejaTourne = true;
 			nbTours++;
