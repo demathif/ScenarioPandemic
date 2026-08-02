@@ -3,8 +3,7 @@
 Remarque : merci !
 */
 
-let timerDuration = 120; // durée par défaut (2 min)
-let remainingTime = timerDuration;
+let remainingTime = 120; // durée par défaut (2 min)
 let timerInterval = null;
 
 // Retourne le temps restant formaté "MM:SS"
@@ -17,9 +16,6 @@ function getTempsFormate() {
 // Mettre à jour l'affichage du temps
 function updateDisplay() {
   const txt = getTempsFormate();
-  // Affichage legacy (peut ne plus exister) : on protège
-  const timerEl = document.getElementById("timer");
-  if (timerEl) timerEl.textContent = txt;
   // Affiche aussi le décompte dans le bouton unique quand le chrono tourne
   const btn = document.getElementById('idBoutonUnique');
   if (btn && isTimerRunning()) {
@@ -36,7 +32,14 @@ function runTimer() {
     } else {
       clearInterval(timerInterval);
       timerInterval = null;
-      document.getElementById("beep").play();
+      // Garde-fou : l'élément audio peut être absent ou le son bloqué par le navigateur
+      const beepEl = document.getElementById("beep");
+      if (beepEl && typeof beepEl.play === "function") {
+        try {
+          const p = beepEl.play();
+          if (p && typeof p.catch === "function") p.catch(() => {});
+        } catch (e) { /* audio bloqué */ }
+      }
     }
   }, 1000);
 }
@@ -44,12 +47,7 @@ function runTimer() {
 // Démarrer le minuteur avec une durée précise (secondes)
 function startTimerDuree(seconds) {
   pauseTimer();
-  timerDuration = seconds;
   remainingTime = seconds;
-  // Synchronise la radio correspondante si elle existe
-  document.querySelectorAll('input[name="duration"]').forEach(radio => {
-    radio.checked = (parseInt(radio.value, 10) === seconds);
-  });
   updateDisplay();
   runTimer();
 }
@@ -79,19 +77,3 @@ function resumeTimer() {
     runTimer();
   }
 }
-
-// Réinitialiser
-function resetTimer() {
-  pauseTimer();
-  const radios = document.querySelectorAll('input[name="duration"]');
-  radios.forEach(radio => {
-    if (radio.checked) {
-      timerDuration = parseInt(radio.value);
-    }
-  });
-  remainingTime = timerDuration;
-  updateDisplay();
-}
-
-// Initialisation
-resetTimer();

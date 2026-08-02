@@ -9,6 +9,12 @@ var nbCartesPropagationTournees = 0;
 var pseudos = [];
 var lienSansPseudo = "";
 
+/** Cartes événement choisies par le joueur pour le paquet (défaut = celles définies) */
+var evenementsSelectionnes = [];
+
+/** Indique si le joueur a choisi lui-même les cartes événement (sinon on garde le défaut) */
+var evenementsChoisisParJoueur = false;
+
 // Permet de bien compter le nombre de tour
 var isChronoDejaTourne = false;
 
@@ -30,6 +36,58 @@ var vars = {};
 
 /** Identifiant unique de la partie */
 var idUnique = 0;
+
+/** Constantes de règles (format Coupe du Monde) */
+var MAX_TOURS = 26;                                     // Nombre maximal de tours avant la fin du paquet joueur
+var PSEUDO_REGEX = /^[A-Za-z0-9_]{1,16}$/;              // Pseudo autorisés : lettres, chiffres, tiret bas
+
+/** Thème : 'auto' | 'light' | 'dark' (persisté dans localStorage) */
+var themeEtat = 'auto';
+
+/** Lit le thème mémorisé (ou 'auto' pour suivre le système) */
+function lireTheme() {
+	try { return localStorage.getItem('theme') || 'auto'; } catch (e) { return 'auto'; }
+}
+
+/** Applique le thème via data-theme sur <html> et met à jour le bouton */
+function appliquerTheme() {
+	themeEtat = lireTheme();
+	var sombre = false;
+	if (themeEtat === 'auto') {
+		sombre = !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+	} else {
+		sombre = (themeEtat === 'dark');
+	}
+	document.documentElement.setAttribute('data-theme', sombre ? 'dark' : 'light');
+	mettreAJourBoutonTheme();
+}
+
+/** Met à jour le libellé du bouton de bascule de thème */
+function mettreAJourBoutonTheme() {
+	var btn = document.getElementById('idBoutonTheme');
+	if (!btn) return;
+	var sombre = document.documentElement.getAttribute('data-theme') === 'dark';
+	btn.textContent = sombre ? '☀️ Thème clair' : '🌙 Thème sombre';
+}
+
+/** Bascule entre clair et sombre (enregistre le choix manuel) */
+function toggleTheme() {
+	var sombre = document.documentElement.getAttribute('data-theme') === 'dark';
+	themeEtat = sombre ? 'light' : 'dark';
+	try { localStorage.setItem('theme', themeEtat); } catch (e) {}
+	appliquerTheme();
+}
+
+/** Applique le thème et suit les changements du thème système (si 'auto') */
+function initialiserTheme() {
+	appliquerTheme();
+	if (window.matchMedia) {
+		var mq = window.matchMedia('(prefers-color-scheme: dark)');
+		var onChangement = function() { if (lireTheme() === 'auto') appliquerTheme(); };
+		if (mq.addEventListener) mq.addEventListener('change', onChangement);
+		else if (mq.addListener) mq.addListener(onChangement);
+	}
+}
 
 /** Retourne la couleur de la carte */
 function getCouleur(carte){
@@ -77,13 +135,16 @@ function miseEnPlaceJoueur(idJoueur) {
 			'<span class="player-pawn" style="background-color:' + pionColor + ';">' +
 				'J' + numJoueur +
 			'</span>' +
-			'<img src="../images/' + encodeURI(role) + '.png" width="100" height="130" class="zoomA" alt="' + role + '" title="' + (descriptionsRole[role] || role) + '">' +
+			'<img src="../images/' + encodeURI(role) + '.png" width="160" height="200" class="zoomA" alt="' + role + '" title="' + (descriptionsRole[role] || role) + '">' +
 		'</div>';
 }
 
 
 /** Fonction principale */
 function run () {
+	// Applique le thème (clair/sombre) et suit les préférences système
+	initialiserTheme();
+
 	// S'il existe des paramètres dans la requête, on s'en sert
 	vars = {};
 	vars['roleJoueur1'] = "";
@@ -127,7 +188,10 @@ function afficherSelection() {
 	// Sur la sélection, le menu ☰ ne propose que "À propos" (ni lien, ni actions de jeu)
 	document.querySelectorAll('.menu-item').forEach(function(el) { el.style.display = "none"; });
 	document.querySelectorAll('.menu-jeu').forEach(function(el) { el.style.display = "none"; });
+	// Ferme les panneaux éventuellement ouverts depuis la vue de jeu
+	fermerPanneauxOuverts();
 	genererGrillePersonnages();
+	genererGrilleEvenements();
 }
 
 
@@ -139,6 +203,18 @@ function afficherJeu() {
 	// En jeu, le menu ☰ affiche le lien + les actions de jeu
 	document.querySelectorAll('.menu-item').forEach(function(el) { el.style.display = ""; });
 	document.querySelectorAll('.menu-jeu').forEach(function(el) { el.style.display = ""; });
+	// Ferme les panneaux ouverts depuis l'écran de sélection (À propos, menu ☰, fin de partie)
+	fermerPanneauxOuverts();
+}
+
+/** Ferme les panneaux auxiliaires (À propos, menu ☰, fin de partie) */
+function fermerPanneauxOuverts() {
+	var info = document.getElementById('idInfo');
+	if (info) info.style.display = "none";
+	var menu = document.getElementById('idMenuSecondaire');
+	if (menu) menu.style.display = "none";
+	var fin = document.getElementById('idFinPartie');
+	if (fin) fin.style.display = "none";
 }
 
 
@@ -189,11 +265,84 @@ function genererGrillePersonnages() {
 	var startBtn = document.createElement("button");
 	startBtn.type = "button";
 	startBtn.className = "btn-start";
-	startBtn.innerHTML = '<span class="btn-start-icon">▶</span><span class="btn-start-text">Commencer</span>';
+	startBtn.title = "Commencer la partie";
+	startBtn.innerHTML = '<span class="btn-start-icon">▶</span>' +
+		'<span class="btn-start-text-main">READY</span>' +
+		'<span class="btn-start-text-sub">TO SURVIVE</span>';
 	startBtn.onclick = function() { get_roles(myForm); };
 	grid.appendChild(startBtn);
 
 	myForm.appendChild(grid);
+}
+
+
+/** Génère la grille de sélection des cartes événement du paquet */
+function genererGrilleEvenements() {
+	var container = document.getElementById('idGrilleEvenements');
+	if (!container) return;
+
+	// Réinitialise la sélection par défaut : les 8 cartes événement définies
+	evenementsSelectionnes = evenements.slice();
+	evenementsChoisisParJoueur = false;
+	container.innerHTML = "";
+
+	var grid = document.createElement("div");
+	grid.className = "evenements-grid";
+
+	evenements.forEach(function(nom) {
+		var card = document.createElement("label");
+		card.className = "evenement-card";
+
+		var cb = document.createElement("input");
+		cb.type = "checkbox";
+		cb.className = "evenement-checkbox";
+		cb.value = nom;
+		cb.checked = evenementsSelectionnes.indexOf(nom) >= 0;
+		cb.onchange = function() { mettreAJourCompteurEvenements(); };
+
+		var nomSpan = document.createElement("span");
+		nomSpan.className = "evenement-nom";
+		nomSpan.textContent = nom;
+
+		card.title = descriptionsEvenement[nom] || "";
+		card.appendChild(cb);
+		card.appendChild(nomSpan);
+		grid.appendChild(card);
+	});
+
+	container.appendChild(grid);
+	mettreAJourCompteurEvenements();
+}
+
+/** Lit les cartes événement cochées dans la grille de sélection */
+function lireEvenementsCoches() {
+	var liste = [];
+	var checks = document.querySelectorAll('.evenement-checkbox:checked');
+	for (var i = 0; i < checks.length; i++) {
+		liste.push(checks[i].value);
+	}
+	return liste;
+}
+
+/** Applique un mode à la sélection : 'defaut' (les 8 cartes définies) | 'aucun' */
+function selectionEvenements(mode) {
+	var checks = document.querySelectorAll('.evenement-checkbox');
+	for (var i = 0; i < checks.length; i++) {
+		if (mode === 'defaut') {
+			checks[i].checked = true; // les 8 cartes définies sont toutes cochées par défaut
+		} else if (mode === 'aucun') {
+			checks[i].checked = false;
+		}
+	}
+	mettreAJourCompteurEvenements();
+}
+
+/** Met à jour le compteur de cartes événement sélectionnées */
+function mettreAJourCompteurEvenements() {
+	var el = document.getElementById('idCompteurEvenements');
+	if (!el) return;
+	var n = document.querySelectorAll('.evenement-checkbox:checked').length;
+	el.textContent = n + " carte" + (n > 1 ? "s" : "") + " événement sélectionnée" + (n > 1 ? "s" : "");
 }
 
 
@@ -210,7 +359,7 @@ function get_roles (form) {
 				choice[count] = checkboxes[i].value;
 				count++;
 			} else if (count >= limit) {
-				alert("Vous ne pouvez pas choisir plus de " + limit + " personnages");
+				afficherToast("Vous ne pouvez pas choisir plus de " + limit + " personnages", "error");
 				return;
 			}
 		}
@@ -225,6 +374,10 @@ function get_roles (form) {
 			choice[limit - j - 1] = roles_copy[j];
 		}
 	}
+
+	// Récupère les cartes événement cochées par le joueur (défaut = cartes définies)
+	evenementsSelectionnes = lireEvenementsCoches();
+	evenementsChoisisParJoueur = true;
 
 	shuffle(choice);
 	demarrerPartie(choice[0], choice[1]);
@@ -248,14 +401,14 @@ function initialiserPartie() {
 	}
 	// Sinon, on le génère
 	else {
-		// Tableau temporaire d'évènements
-		var evenementsHasard = evenements;
+		// Cartes événement du paquet : celles choisies par le joueur (par défaut les 8 cartes définies)
+		var evenementsPool = (evenementsChoisisParJoueur ? evenementsSelectionnes.slice() : evenements.slice());
 
-		// Mélange du tableau d'évènements
-		shuffle(evenementsHasard);
+		// Mélange des cartes événement
+		shuffle(evenementsPool);
 
-		// Création du paquet joueur, avec que 5 évènements
-		paquetJoueur = bleu.concat(jaune).concat(noir).concat(rouge).concat(evenementsHasard.slice(3));
+		// Création du paquet joueur : 5 cartes événement (ou moins si le joueur en a choisi moins)
+		paquetJoueur = bleu.concat(jaune).concat(noir).concat(rouge).concat(evenementsPool.slice(0, Math.min(5, evenementsPool.length)));
 
 		// Mélange du paquet joueur
 		shuffle(paquetJoueur);
@@ -335,20 +488,11 @@ function initialiserPartie() {
 
 /** Affiche et supprime la 1ère carte du paquet joueur */
 function tirerCartes(idCarte) {
-	// On affiche les idCarte au cas où elles étaients masquées
-	document.getElementById('idCarte1').style.display = "block";
-	document.getElementById('idCarte2').style.display = "block";
-
-	document.getElementById('idCarteJoueurs').className = 'enCours carteJoueur';
-	document.getElementById('idDivCartesPropagation').className = 'pasEnCours';
-
 	var isIdCarte1 = idCarte == 'idCarte1';
 	if (isIdCarte1) {
 		isChronoDejaTourne = false;
 		document.getElementById('idGoJoueur').className = "";
-		document.getElementById('idCartesPropagation').innerHTML = "";
 		isPseudoGagnePerduCeTour("J");
-		document.getElementById('idCarte2').innerHTML = "...";
 		document.getElementById('idButtonCarte1').style.display = "none";
 		document.getElementById('idButtonCarte2').style.display = "block";
 		// Début de tour : on vide le cadre du joueur actif (les 4 initiales incluses)
@@ -366,7 +510,7 @@ function tirerCartes(idCarte) {
 
 	// S'il n'y a plus de carte dans le paquet, alors la partie est perdue
 	if(paquetJoueur.length == 0) {
-		alert("Désolé, il ne reste plus de carte... vous avez perdu !");
+		afficherModal("💀 Partie perdue", "Désolé, il ne reste plus de carte... vous avez perdu !");
 		document.getElementById('idTournePropagation').disabled = true;
 		return;
 	}
@@ -377,7 +521,6 @@ function tirerCartes(idCarte) {
 	var descEvt = descriptionsEvenement[carte];
 	var htmlCarte = "<span class='carte-color' data-color='" + getCouleur(carte) + "'" +
 		(descEvt ? ' title="' + descEvt + '"' : "") + ">" + carte + "</span>";
-	document.getElementById(idCarte).innerHTML = htmlCarte;
 	document.getElementById('idRecap').innerHTML += carte + "<br />";
 
 	// Ajouter la carte dans la zone du joueur actif (suite des 4 premières)
@@ -506,16 +649,16 @@ function isPseudoGagnePerduCeTour(typeCarte) {
 		*/
 
 		// Cas particulier
-		if (paquetJoueur.length == 1 && nbTours == 26 && nbTours == tab[1]) {
-			alert("Le joueur " + tab[0] + " a perdu aussi par manque de carte dans le paquet joueur.");
+		if (paquetJoueur.length == 1 && nbTours == MAX_TOURS && nbTours == tab[1]) {
+			afficherToast("Le joueur " + tab[0] + " a perdu aussi par manque de carte dans le paquet joueur.", "error");
 		}
 
 		// Cas général
 		// Si on tire une carte Propagation, on regarde si quelqu'un a perdu
-		if (typeCarte == "P" && tab[1] <= 25 ) {
+		if (typeCarte == "P" && tab[1] <= (MAX_TOURS - 1) ) {
 			// Si la partie était perdue et qu'on a tournée le même nombre de cartes
 			if (tab[2] == '0' && nbCartesPropagationTournees == tab[3]) {
-				alert("Le joueur " + tab[0] + " a perdu sur cette prochaine carte propagation.");
+				afficherToast("Le joueur " + tab[0] + " a perdu sur cette prochaine carte propagation.", "error");
 				}
 			}
 
@@ -523,7 +666,7 @@ function isPseudoGagnePerduCeTour(typeCarte) {
 		if (typeCarte == "J") {
 			// Si la partie était gagnée et qu'on est on même nombre
 			if (tab[2] == '1' && nbTours == tab[1]) {
-				alert("Le joueur " + tab[0] + " a gagné au tour précédent.");
+				afficherToast("Le joueur " + tab[0] + " a gagné au tour précédent.", "success");
 			}
 		}
 	});
@@ -688,10 +831,6 @@ function ajouterCarteAuPanel(carteStr) {
 function tournePropogation(){
 	nbCartesPropagationTournees++;
 
-	document.getElementById('idCartesPropagation').style.display = "block";
-	document.getElementById('idCarteJoueurs').className = 'pasEnCours';
-	document.getElementById('idDivCartesPropagation').className = 'enCours cartePropagation';
-
 	// On récupère 1ère carte du paquet propagation
 	var carte = paquetPropagationEntier.shift();
 	cartesPropagationTirees.push(carte);
@@ -706,14 +845,14 @@ function tournePropogation(){
 	mettreAJourPanelPropagation();
 	mettreAJourCartesATirer(carte);
 
-	// On coupe la carte au '-' pour récupérer la 2° partie (qui ne contient que la ville)
-	var ville = carte.split('-');
-
-	document.getElementById('idCartesPropagation').innerHTML += ville[0] + "<span class='carte-color' data-color='" + getCouleur(ville[1].substring(1)) + "'>" + ville[1].substring(1) + "</span><br />";
 	document.getElementById('idRecap').innerHTML += carte + "<br />";
 
-	// Ici, on tire la X° carte sur X cartes à tirer du paquet propagation
-	if (carte.charAt(0) == carte.charAt(2)) {
+	// Ici, on tire la X° carte sur X cartes à tirer du paquet propagation.
+	// Fin de lot détectée quand le numérateur vaut le dénominateur (ex. "4/4 - Ville").
+	var debutCarte = carte.split('-')[0].trim();
+	var numLot = parseInt(debutCarte.split('/')[0], 10);
+	var denomLot = parseInt(debutCarte.split('/')[1], 10);
+	if (!isNaN(numLot) && !isNaN(denomLot) && numLot === denomLot) {
 		var joueur = (paquetJoueur.length + 1) % 4 == 0 ? 1 : 2;
 		document.getElementById('idTournePropagation').disabled = true;
 		document.getElementById('idGoJoueur').innerHTML = "Tour : " + document.getElementById('idJoueur' + joueur + 'Role').innerHTML;
@@ -742,11 +881,7 @@ function surlignerJoueur(numJoueur) {
 /** Lorqu'on est en survol du chrono */
 function nouveauTour() {
 	if (document.getElementById('idGoJoueur').className == "goJoueur") {
-		document.getElementById('idDivCartesPropagation').className = 'enCours';
 		document.getElementById('idButtonCarte1').disabled = false;
-		document.getElementById('idCarte1').style.display = "none";
-		document.getElementById('idCarte2').style.display = "none";
-		document.getElementById('idCartesPropagation').style.display = "none";
 		// Début de tour : on ne garde que la dernière carte de propagation (le top deck)
 		var propContainer = document.getElementById('idPropagationCartes');
 		var cartesProp = propContainer.querySelectorAll('.propa-card');
@@ -791,23 +926,29 @@ function partieTerminee(){
 
 	// Si le pseudo n'est pas rempli
 	if(ps == "") {
-		alert("Vous devez saisir un pseudo");
+		afficherToast("Vous devez saisir un pseudo", "error");
+		return;
+	}
+
+	// Validation du pseudo (évite l'injection HTML et préserve le format "pseudo.tour.gagne.nbCarte.nbRemedes.nbEclosions")
+	if(!PSEUDO_REGEX.test(ps)) {
+		afficherToast("Pseudo invalide : utilisez 1 à 16 lettres, chiffres ou tirets bas (_).", "error");
 		return;
 	}
 
 	// On vérifier qu'un bouton radio ait été coché
 	if (document.getElementById('idGagne').checked) {
 		gagnePerdue = 1;
-		alert("Félicitations " + ps + " !");
+		afficherToast("Félicitations " + ps + " !", "success");
 	}
 	if (document.getElementById('idPerdu').checked) {
 		gagnePerdue = 0;
-		alert("Dommage " + ps + "...");
+		afficherToast("Dommage " + ps + "...", "warning");
 	}
 
 	// Si le joueur n'a pas cliqué sur Gagné ou Perdu
 	if (gagnePerdue == -1) {
-		alert("Vous devez cocher une case");
+		afficherToast("Vous devez cocher une case", "error");
 		return;
 	}
 	pseudos[pseudos.length] = ps + "." + nbTours + "." + gagnePerdue + "." + nbCartesPropagationTournees + "." + document.getElementById('idNbRemedes').value + "." + document.getElementById('idNbEclosions').value;
@@ -822,18 +963,68 @@ function partieTerminee(){
 }
 
 
+/** Échappe les caractères HTML pour éviter toute injection (XSS) */
+function escapeHtml(str) {
+	// Entités construites par concaténation (évite tout décodage prématuré du code source)
+	var ENT = {
+		'&': '&' + 'amp;',
+		'<': '&' + 'lt;',
+		'>': '&' + 'gt;',
+		'"': '&' + 'quot;',
+		"'": '&' + '#39;'
+	};
+	return String(str).replace(/[&<>"']/g, function(ch) { return ENT[ch]; });
+}
+
 /** Génère le lien de la partie */
 function genererLienPartie() {
 	// Lien sans pseudo si aucun joueur n'a encore été enregistré
 	var lien = pseudos.length > 0 ? lienSansPseudo + "&pseudos=" + pseudos.join('*') : lienSansPseudo;
 	document.getElementById('idLienPartie').href = lien;
-	navigator.clipboard.writeText(lien)
-      .then(() => {
-        alert("Lien copié !");
-      })
-      .catch(err => {
-        console.error("Erreur lors de la copie : ", err);
-      });
+
+	// Copie via l'API Clipboard, avec repli si indisponible ou en échec
+	if (navigator.clipboard && navigator.clipboard.writeText) {
+		navigator.clipboard.writeText(lien)
+			.then(function() { afficherToast("Lien copié !"); })
+			.catch(function(err) {
+				console.error("Erreur lors de la copie : ", err);
+				copierLienFallback(lien);
+			});
+	} else {
+		copierLienFallback(lien);
+	}
+}
+
+/** Repli de copie : zone de texte temporaire + execCommand, sinon lien visible */
+function copierLienFallback(lien) {
+	var textarea = document.createElement('textarea');
+	textarea.value = lien;
+	textarea.setAttribute('readonly', '');
+	textarea.style.position = 'fixed';
+	textarea.style.top = '0';
+	textarea.style.left = '0';
+	textarea.style.opacity = '0';
+	document.body.appendChild(textarea);
+	textarea.focus();
+	textarea.select();
+	var ok = false;
+	try {
+		ok = document.execCommand('copy');
+	} catch (e) { /* ignoré */ }
+	document.body.removeChild(textarea);
+
+	if (ok) {
+		afficherToast("Lien copié !");
+	} else {
+		// Dernier recours : afficher le lien sous forme cliquable
+		var lienEl = document.getElementById('idLienPartie');
+		if (lienEl) {
+			lienEl.textContent = lien;
+			lienEl.target = "_blank";
+			document.getElementById('idSpanLienPartie').style.display = "block";
+		}
+		afficherToast("Copie impossible : cliquez sur le lien affiché ci-dessous");
+	}
 }
 
 /** Ouvre / ferme le menu secondaire (☰) */
@@ -861,26 +1052,62 @@ function toggleInfo() {
 }
 
 
-/** Affiche une notification temporaire (toast) qui disparaît d'elle-même */
+/** Affiche une notification temporaire (toast) qui disparaît d'elle-même
+	type : 'info' (défaut), 'success', 'warning', 'error' */
 var toastTimer = null;
-function afficherToast(message) {
+function afficherToast(message, type) {
 	var toast = document.getElementById('idToast');
 	if (!toast) return;
 	toast.textContent = message;
+	toast.className = "toast" + (type ? " toast-" + type : "");
 	toast.style.display = "block";
 	toast.style.opacity = "1";
 	if (toastTimer) clearTimeout(toastTimer);
+	var duree = (type == "error") ? 6000 : 4000;
 	toastTimer = setTimeout(function() {
 		toast.style.opacity = "0";
 		setTimeout(function() { toast.style.display = "none"; }, 300);
-	}, 4000);
+	}, duree);
 }
 
-/** */
+/** Affiche une modale générique (remplace alert/confirm).
+	boutons : tableau de { label, cls, onClick } — par défaut un seul bouton "OK" */
+function afficherModal(titre, message, boutons) {
+	var overlay = document.getElementById('idModal');
+	if (!overlay) return;
+	document.getElementById('idModalTitle').textContent = titre || "";
+	document.getElementById('idModalMessage').textContent = message || "";
+	var actions = document.getElementById('idModalActions');
+	actions.innerHTML = "";
+	var liste = (boutons && boutons.length) ? boutons : [{ label: "OK", cls: "primary" }];
+	liste.forEach(function(b) {
+		var btn = document.createElement('button');
+		btn.type = "button";
+		btn.className = "modal-btn " + (b.cls || "primary");
+		btn.textContent = b.label;
+		btn.onclick = function() {
+			fermerModal();
+			if (typeof b.onClick === "function") b.onClick();
+		};
+		actions.appendChild(btn);
+	});
+	overlay.style.display = "flex";
+	var premier = actions.querySelector('button');
+	if (premier) premier.focus();
+}
+
+/** Ferme la modale générique */
+function fermerModal() {
+	var overlay = document.getElementById('idModal');
+	if (overlay) overlay.style.display = "none";
+}
+
+/** Nouvelle partie (avec confirmation via modale) */
 function nouvellePartie() {
-	if(confirm("Voulez-vous démarrer une nouvelle partie ?")) {
-		window.location.replace("../views/index.html");
-	}
+	afficherModal("🔄 Nouvelle partie", "Voulez-vous démarrer une nouvelle partie ?", [
+		{ label: "Annuler", cls: "secondary" },
+		{ label: "Oui, nouvelle partie", cls: "primary", onClick: function() { window.location.replace("../views/index.html"); } }
+	]);
 }
 
 /** Permet de rendre visible quelques données de débugage */
@@ -944,6 +1171,7 @@ function mettreAJourBoutonUnique() {
 	}
 
 	btn.disabled = !actif;
+	btn.setAttribute('aria-label', label);
 	btn.innerHTML = '<span class="bouton-unique-icone">' + icone + '</span>' +
 					'<span class="bouton-unique-label">' + label + '</span>';
 }
@@ -1007,7 +1235,7 @@ function choixChrono(choix) {
 /** Rempli le tableau de l'historique des joueurs de la partie */
 function historiquePartie () {
 	cacherAfficherCartes('idSpoilHistoJoueurs', 'idLienSpoilHistoJoueurs');
-	var monTableau = "<center>Si une équipe perd <b>avant le 26° tour</b> : soit le nombre d'éclosions est à 8, soit il manquait des cubes.<table border='1'> "+
+	var monTableau = "<center>Si une équipe perd <b>avant le " + MAX_TOURS + "° tour</b> : soit le nombre d'éclosions est à 8, soit il manquait des cubes.<table border='1'> "+
 						"<tr> "+
 						"	<th>Joueurs</th> "+
 						"	<th>Status</th> "+
@@ -1021,12 +1249,12 @@ function historiquePartie () {
 		// item est du type = potaw.1.0.10 (pseudo . nbTour . gagnePerdu . nbCartePropa . nbRemedes . nbEclosions)
 		var tab = item.split('.');
 		monTableau += "<tr> "+
-						"<td>" + tab[0] + "</td>"+
+						"<td>" + escapeHtml(tab[0]) + "</td>"+
 						"<td>" + (tab[2] == 0 ? "Perdu" : "Gagné") + "</td>"+
-						"<td>" + tab[1] + "</td>"+
-						"<td>" + tab[3] + "</td>"+
-						"<td>" + tab[4] + "</td>"+
-						"<td>" + tab[5] + "</td>"+
+						"<td>" + escapeHtml(tab[1]) + "</td>"+
+						"<td>" + escapeHtml(tab[3]) + "</td>"+
+						"<td>" + escapeHtml(tab[4]) + "</td>"+
+						"<td>" + escapeHtml(tab[5]) + "</td>"+
 					"</tr>";
 	});
 	document.getElementById('idSpoilHistoJoueurs').innerHTML = monTableau + "</table></center>";

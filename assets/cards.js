@@ -34,7 +34,6 @@ const roles = ['Scientifique', 'Epidémiologiste', 'Opérateur de terrain', 'Sp�
 const descriptionsRole = {
 	'Médecin': 'Le Médecin : Retire tous les cubes d\'une maladie en une action (et gratuitement si elle est guérie).',
 	'Scientifique': 'La Scientifique : Trouve un remède avec seulement 4 cartes de la même couleur au lieu de 5.',
-	'Répartiteur': 'Le Répartiteur : Déplace les pions des autres joueurs à leur place ou les regroupe.',
 	'Chercheuse': 'La Chercheuse : Donne n\'importe quelle carte Ville de sa main à un joueur sur la même case.',
 	'Expert aux opérations': 'L\'Expert aux Opérations : Construit une station de recherche sans carte et peut s\'envoler depuis celle-ci.',
 	'Spécialiste en quarantaine': 'La Spécialiste en Mise en Quarantaine : Sécurise sa ville et toutes les villes reliées en bloquant les cubes et éclosions.',

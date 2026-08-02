@@ -1,19 +1,35 @@
 <!doctype html>
 <html lang="fr">
 	<head>
-		<title>Scénarios Pandémie</title>
+		<title>Pandemic Survival — Distancing Edition</title>
+		<script>
+			// Applique le thème (clair/sombre) avant le premier rendu pour éviter le flash
+			(function() {
+				try {
+					var t = localStorage.getItem('theme') || 'auto';
+					var sombre = t === 'dark' || (t === 'auto' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+					document.documentElement.setAttribute('data-theme', sombre ? 'dark' : 'light');
+				} catch (e) {}
+			})();
+		</script>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link rel="icon" href="../images/survival.ico" />
-		<link rel="stylesheet" href="../style/style.css?v=31">
-		<script type="text/javascript" src="../assets/cards.js?v=31"></script>
-		<script type="text/javascript" src="../assets/game.js?v=31"></script>
+		<link rel="stylesheet" href="../style/style.css?v=42">
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;700&display=swap" rel="stylesheet" />
+		<script type="text/javascript" src="../assets/cards.js?v=42"></script>
+		<script type="text/javascript" src="../assets/game.js?v=42"></script>
 	</head>
 	
 	<body onload="run();">
 		<header class="topbar">
-			<span class="topbar-title">🦠 Scénario Pandemic (version Coupe du Monde)</span>
-			<button class="topbar-menu" onclick="toggleMenu()" title="Menu">☰</button>
+			<span class="topbar-title">
+				<span class="topbar-title-main">Pandemic</span>
+				<span class="topbar-title-sub">Survival Distancing Edition</span>
+			</span>
+			<button class="topbar-menu" onclick="toggleMenu()" title="Menu" aria-label="Menu">☰</button>
 		</header>
 
 		<!-- Menu secondaire : actions accessoires (actions de jeu masquées sur la sélection) -->
@@ -23,17 +39,52 @@
 			<button onclick="nouvellePartie()" class="menu-jeu">🔄 Nouvelle partie</button>
 			<a class="menu-item" href="https://docs.google.com/spreadsheets/d/1zwSPXdVmSMyLT-hhdvtLy0Kp2LJ_qGabPaC65YANEVw/edit?gid=0#gid=0" target="_blank">📊 Lien des précédentes parties</a>
 			<label class="menu-debug menu-jeu"><input id="idDebug" type="checkbox" onclick="debug()"> 🐞 Debug</label>
+			<button onclick="toggleTheme()" id="idBoutonTheme" aria-label="Basculer le thème clair/sombre">🌙 Thème sombre</button>
 			<button onclick="toggleInfo()">ℹ️ À propos</button>
 		</div>
 
-		<!-- Info (version / auteurs), affichée via le menu ☰ → À propos -->
+		<!-- Panneau "À propos" modernisé (menu ☰ → À propos) -->
 		<div id="idInfo" class="info-panel" style="display:none;">
-			v0.9.0<br />
-			Authors : Potaw (CDM 2019 avec Yo) et Fk (sparring de la CDM 2019)
+			<div class="info-card">
+				<div class="info-body">
+					<div class="info-header">
+						<img class="info-logo-small"
+							src="https://images.squarespace-cdn.com/content/v1/54dc217de4b05cd95c7305b4/1588711749296-EZQ3731X6JH0TA5H7MBU/Pandemic-Survival-distancing_logo.png?format=2500w"
+							alt="Logo Pandemic Survival" />
+						<h2 class="info-title">Pandemic Survival</h2>
+					</div>
+					<p class="info-description">
+						Une adaptation officielle de <strong>Pandemic</strong> conçue par <strong>Matt Leacock</strong> pour jouer à distance, en visioconférence (format « over Zoom »).
+						Ce site est un support de jeu en ligne au format « Coupe du Monde » : génération de scénarios, lien de partie partagé (26 tours) et suivi des statistiques des joueurs.
+					</p>
+					<ul class="info-links">
+						<li>📖 <a href="https://www.leacock.com/blog/2020/5/3/pandemic-survival-over-zoom" target="_blank" rel="noopener">Présentation « Pandemic Survival over Zoom » (blog de Matt Leacock)</a></li>
+						<li>📄 <a href="https://www.scifilx.pt/wp-content/uploads/Pandemic-Survival-Rules.pdf" target="_blank" rel="noopener">Règles officielles de Pandemic Survival (PDF)</a></li>
+						<li>🏆 <a href="https://www.lindependant.fr/2019/10/20/jeux-de-societe-arnaud-villanove-de-rivesaltes-est-champion-du-monde-8493369.php" target="_blank" rel="noopener">Arnaud et Yoann, champion du monde de Pandemic 2019</a></li>
+					</ul>
+					<div class="info-authors">
+						<span class="info-author">🏆 <strong>Potaw</strong> — Champion du monde de Pandemic 2019</span>
+						<span class="info-author">🥊 <strong>Fk</strong> — Préparateur CdM</span>
+					</div>
+					<div class="info-version">Version 0.9.0</div>
+				</div>
+			</div>
 		</div>
 
 		<!-- Notification temporaire (toast) -->
-		<div id="idToast" class="toast" style="display:none;"></div>
+		<div id="idToast" class="toast" style="display:none;" aria-live="polite"></div>
+
+		<!-- Modale générique (remplace alert/confirm) -->
+		<div id="idModal" class="modal-overlay" style="display:none;">
+			<div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="idModalTitle">
+				<div class="modal-header">
+					<span id="idModalTitle" class="modal-title"></span>
+					<button type="button" class="modal-close" onclick="fermerModal()" aria-label="Fermer">✕</button>
+				</div>
+				<div id="idModalMessage" class="modal-message"></div>
+				<div class="modal-actions" id="idModalActions"></div>
+			</div>
+		</div>
 
 		<!-- ═══════ VUE SÉLECTION DES PERSONNAGES ═══════ -->
 		<div id="idViewSelection" class="view-selection">
@@ -42,6 +93,18 @@
 				<form id="idBoxes" name="thisForm">
 					<!-- La grille + le bouton Start sont générés ici par genererGrillePersonnages() -->
 				</form>
+			</div>
+
+			<!-- Sélection des cartes événement du paquet (générée par genererGrilleEvenements()) -->
+			<div class="section-action evenements-section">
+				<p class="selection-intro">🃏 Cartes événement du paquet</p>
+				<p class="selection-hint">Le paquet Joueur contient <strong>5 cartes événement</strong>, tirées au hasard parmi les cartes cochées ci-dessous. Par défaut, les <strong>8 cartes définies</strong> sont sélectionnées : décochez celles que vous ne voulez pas voir dans le paquet, ou laissez-en cochées exactement 5 pour en choisir précisément la composition.</p>
+				<div class="evenements-toolbar">
+					<button type="button" class="secondary" onclick="selectionEvenements('defaut')" title="Restaurer la sélection par défaut (les 8 cartes définies)">Défaut</button>
+					<button type="button" class="secondary" onclick="selectionEvenements('aucun')" title="Aucune carte événement dans le paquet">Aucun</button>
+					<span class="evenements-compteur" id="idCompteurEvenements" aria-live="polite"></span>
+				</div>
+				<div id="idGrilleEvenements" class="evenements-container"></div>
 			</div>
 		</div>
 
@@ -55,7 +118,7 @@
 			</div>
 			<div class="fin-partie-corps">
 				<label class="fin-pseudo">Pseudo :
-					<input id="idPseudo" type="text" size="8" placeholder="a-zA-Z0-9">
+					<input id="idPseudo" type="text" size="8" maxlength="16" pattern="[A-Za-z0-9_]+" placeholder="a-zA-Z0-9_" title="1 à 16 lettres, chiffres ou tirets bas (_)">
 				</label>
 				<label class="fin-resultat"><input type="radio" name="radioPartieTerminee" id="idGagne" onClick="remplirChampsFinPartie(1)"> 🏆 Gagnée</label>
 				<label class="fin-resultat"><input type="radio" name="radioPartieTerminee" id="idPerdu" onClick="remplirChampsFinPartie(0)"> 💀 Perdue</label>
@@ -90,7 +153,7 @@
 		
 
 		<div class="boutons-ligne boutons-auto">
-			<button onclick="boutonUnique()" id="idBoutonUnique" class="bouton-unique">🎯 Tirer (auto)</button>
+			<button onclick="boutonUnique()" id="idBoutonUnique" class="bouton-unique" aria-live="polite">🎯 Tirer (auto)</button>
 			<!-- "Tour : [Rôle]" masqué : le joueur actif est indiqué par le cadre surligné -->
 			<span id="idGoJoueur" style="display:none;">Tour...</span>
 		</div>
@@ -154,19 +217,9 @@
 
 		<!-- Boutons legacy : cachés mais conservés pour la logique d'état du bouton unique -->
 		<div class="boutons-ligne" id="idBoutonsLegacy" style="display:none;">
-			<button id="idButtonCarte1" onclick="tirerCartes('idCarte1')" disabled>Tirer 1<sup>ère</sup> carte</button>
-			<button id="idButtonCarte2" onclick="tirerCartes('idCarte2')" style="display: none;">Tirer 2<sup>nde</sup> carte</button>
-			<button id="idTournePropagation" onclick="tournePropogation()" class="primary">Tirer carte propagation</button>
-		</div>
-
-		<!-- Affichages legacy redondants (masqués, conservés pour la logique) -->
-		<div class="cartes-tirees pasEnCours" id="idCarteJoueurs" style="display:none;">
-			<strong><span id="idCarte1">... </span>
-			<span id="idCarte2"> </span></strong>
-		</div>
-		
-		<div class="cartes-tirees enCours" id="idDivCartesPropagation" style="display:none;">
-			<strong><span id="idCartesPropagation"> </span></strong>
+			<button id="idButtonCarte1" onclick="tirerCartes('idCarte1')" disabled aria-label="Tirer la 1ère carte joueur">Tirer 1<sup>ère</sup> carte</button>
+			<button id="idButtonCarte2" onclick="tirerCartes('idCarte2')" style="display: none;" aria-label="Tirer la 2nde carte joueur">Tirer 2<sup>nde</sup> carte</button>
+			<button id="idTournePropagation" onclick="tournePropogation()" class="primary" aria-label="Tirer une carte propagation">Tirer carte propagation</button>
 		</div>
 
 		<!-- Son de fin de chrono -->
@@ -193,6 +246,6 @@
 
 		</div><!-- /idViewJeu -->
 
-		<script type="text/javascript" src="../assets/minuteur.js?v=31"></script>
+		<script type="text/javascript" src="../assets/minuteur.js?v=42"></script>
 	</body>
 </html>
