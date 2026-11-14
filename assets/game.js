@@ -678,13 +678,26 @@ function getNbCubesPourCarte(carteStr, indexGlobal) {
 	if (carteStr.indexOf("Epidemie") >= 0) {
 		return 0;
 	}
-	// Pour les 9 premières cartes (initial infection)
-	if (indexGlobal < 9) {
-		if (indexGlobal < 3) return 3;
-		if (indexGlobal < 6) return 2;
+
+	// On se base d'abord sur l'étiquette de la carte, indépendamment de l'ordre des appels.
+	// Infection initiale : "X/9 - Ville" (X de 1 à 9) → 3 / 3 / 3 / 2 / 2 / 2 / 1 / 1 / 1 cubes.
+	var debut = carteStr.split('-')[0].trim();
+	var parts = debut.split('/');
+	if (parts.length === 2) {
+		var numLot = parseInt(parts[0], 10);
+		var denomLot = parseInt(parts[1], 10);
+		if (!isNaN(numLot) && denomLot === 9) {
+			if (numLot <= 3) return 3;
+			if (numLot <= 6) return 2;
+			return 1;
+		}
+		// Lots de propagation normaux : 1 cube par ville
 		return 1;
 	}
-	// Pour toutes les cartes suivantes : 1 cube
+
+	// Repli : index 0-based (les 9 premières cartes = infection initiale)
+	if (indexGlobal < 3) return 3;
+	if (indexGlobal < 6) return 2;
 	return 1;
 }
 
@@ -833,7 +846,6 @@ function tournePropogation(){
 
 	// On récupère 1ère carte du paquet propagation
 	var carte = paquetPropagationEntier.shift();
-	cartesPropagationTirees.push(carte);
 
 	// Détection épidémie
 	if (carte.indexOf("Epidemie") >= 0) {
@@ -841,7 +853,10 @@ function tournePropogation(){
 	}
 
 	// Ajout au panneau visuel
+	// IMPORTANT : la carte n'est ajoutée à cartesPropagationTirees qu'APRÈS le rendu,
+	// pour que l'index passé à getNbCubesPourCarte() soit bien 0-based.
 	ajouterCarteAuPanel(carte);
+	cartesPropagationTirees.push(carte);
 	mettreAJourPanelPropagation();
 	mettreAJourCartesATirer(carte);
 
