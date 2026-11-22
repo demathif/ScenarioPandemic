@@ -435,6 +435,8 @@ header {
   box-shadow: var(--shadow-lg);
   max-width: 480px;
   width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
   padding: var(--spacing-lg);
   animation: menuFadeIn 0.15s ease;
 }
@@ -811,6 +813,25 @@ header {
 .carte-color[data-color="red"] { color: var(--color-red); }
 .carte-color[data-color="mediumseagreen"] { color: var(--color-event); font-weight: 600; }
 .carte-color[data-color="slategray"] { color: var(--color-default); }
+
+/* ---- Éléments dont un clic / tap affiche la description ---- */
+[data-aide] {
+  cursor: pointer;
+}
+
+[data-aide]:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Indice discret : une description est disponible */
+.carte-color[data-aide]::after,
+.propa-card-epidemic-name[data-aide]::after {
+  content: " ⓘ";
+  font-size: 0.85em;
+  opacity: 0.6;
+}
 
 
 /* ---- Boutons ---- */

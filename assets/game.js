@@ -111,16 +111,20 @@ function getCouleur(carte){
 
 
 /** Permet de retirer les 4 premières cartes du paquet joueur
-	ainsi que les roles des 2 joueurs */
+	ainsi que les roles des 2 joueurs
+	Retourne { role, cartes } pour le récap debug de la main initiale */
 function miseEnPlaceJoueur(idJoueur) {
 	var cartesHtml = "";
 	var carte = "";
+	var cartesDistribuees = [];
 	var role = rolesShuffle.shift();
 	for (var i = 0; i <= 3; i++) {
 		carte = paquetJoueur.shift();
+		cartesDistribuees.push(carte);
 		var descEvt = descriptionsEvenement[carte];
 		cartesHtml += "<span class='carte-joueur-item'><span class='carte-color' data-color='" + getCouleur(carte) + "'" +
-			(descEvt ? ' title="' + descEvt + '"' : "") + ">" + carte + "</span></span>";
+			(descEvt ? ' title="' + descEvt + '" data-aide="evenement" data-nom="' + carte + '" tabindex="0" role="button"' : "") +
+			">" + carte + "</span></span>";
 	}
 	document.getElementById(idJoueur + 'Cartes').innerHTML = cartesHtml;
 	document.getElementById(idJoueur + 'Role').innerHTML = role;
@@ -135,8 +139,12 @@ function miseEnPlaceJoueur(idJoueur) {
 			'<span class="player-pawn" style="background-color:' + pionColor + ';">' +
 				'J' + numJoueur +
 			'</span>' +
-			'<img src="../images/' + encodeURI(role) + '.png" width="160" height="200" class="zoomA" alt="' + role + '" title="' + (descriptionsRole[role] || role) + '">' +
+			'<img src="../images/' + encodeURI(role) + '.png" width="160" height="200" class="zoomA" alt="' + role + '"' +
+				' title="' + (descriptionsRole[role] || role) + '"' +
+				' data-aide="role" data-nom="' + role + '" tabindex="0" role="button">' +
 		'</div>';
+
+	return { role: role, cartes: cartesDistribuees };
 }
 
 
@@ -144,6 +152,9 @@ function miseEnPlaceJoueur(idJoueur) {
 function run () {
 	// Applique le thème (clair/sombre) et suit les préférences système
 	initialiserTheme();
+
+	// Active l'ouverture des descriptions de cartes au clic / tap / clavier
+	initialiserAideCartes();
 
 	// S'il existe des paramètres dans la requête, on s'en sert
 	vars = {};
@@ -395,9 +406,27 @@ function demarrerPartie(role1, role2) {
 
 /** Initialise la partie (paquets, pseudos, lien, mise en place des joueurs) */
 function initialiserPartie() {
+	// Réinitialise les noms d'épidémies rencontrées (utile en rejeu de lien)
+	epidemiesNom = [];
+
 	// Si le paquetJoueur est passé en paramètre, on le prend
 	if(vars['paquetJoueur'].length >= 1) {
 		paquetJoueur = decodeURI(vars['paquetJoueur']).split('*');
+
+		// Si le paquet propagation vient aussi du lien, preparationPaquetPropagations()
+		// n'est pas appelée : on reconstruit l'ordre des épidémies du paquet joueur
+		// pour pouvoir afficher leurs noms et descriptions.
+		// (même logique de parcours par paires que preparationPaquetPropagations())
+		if (vars['paquetPropagationEntier'].length >= 1) {
+			for (var e = 8; e < paquetJoueur.length; e += 2) {
+				if (epidemies.indexOf(paquetJoueur[e]) >= 0) {
+					epidemiesNom.push(paquetJoueur[e]);
+				}
+				if (epidemies.indexOf(paquetJoueur[e + 1]) >= 0) {
+					epidemiesNom.push(paquetJoueur[e + 1]);
+				}
+			}
+		}
 	}
 	// Sinon, on le génère
 	else {
@@ -457,13 +486,20 @@ function initialiserPartie() {
 		afficherToast("Nombre de personnes ayant joué ce scénario (" + idUnique + ") : " + pseudos.length + " — " + joueurs.join(" · "));
 	}
 	else {
-		idUnique = Date.now();
-		afficherToast("Vous êtes le 1er à jouer ce scénario (" + idUnique + "). Bon chance !");
+		// On conserve l'idUnique du lien partagé (sinon l'historique du scénario serait perdu)
+		if (idUnique == 0) {
+			idUnique = Date.now();
+			afficherToast("Vous êtes le 1er à jouer ce scénario (" + idUnique + "). Bonne chance !");
+		}
+		else {
+			afficherToast("Rejeu du scénario (" + idUnique + "). Vous êtes le 1er à enregistrer un résultat — bonne chance !");
+		}
 	}
 
 
-	// On génère le lien de la partie
-	lienSansPseudo = "game.html?" +
+	// On génère le lien de la partie (URL absolue, ouvrable depuis n'importe où)
+	var baseLien = window.location.href.split('#')[0].split('?')[0];
+	lienSansPseudo = baseLien + "?" +
 					(idUnique == 0 ? "" : "idUnique=" + idUnique) +
 					"&roleJoueur1=" +  encodeURI(rolesShuffle[0]) +
 					"&roleJoueur2=" +  encodeURI(rolesShuffle[1]) +
@@ -471,8 +507,9 @@ function initialiserPartie() {
 					"&paquetPropagationEntier=" + encodeURI(paquetPropagationEntier.join('*'));
 
 	// Permet de tirer les 4 cartes pour les 2 joueurs
-	miseEnPlaceJoueur('idJoueur1');
-	miseEnPlaceJoueur('idJoueur2');
+	var main1 = miseEnPlaceJoueur('idJoueur1');
+	var main2 = miseEnPlaceJoueur('idJoueur2');
+	construireMainInitiale(main1, main2);
 
 	// On écrit toutes les cartes au cas où
 	document.getElementById('idSpoilPaquetJoueur').innerHTML = paquetJoueur.join("<br />");
@@ -517,10 +554,11 @@ function tirerCartes(idCarte) {
 
 	// On prend la prochaine carte du paquet
 	var carte = paquetJoueur.shift();
-	// Si c'est une carte événement, on affiche sa description au survol
+	// Si c'est une carte événement, on affiche sa description au survol et au tap
 	var descEvt = descriptionsEvenement[carte];
 	var htmlCarte = "<span class='carte-color' data-color='" + getCouleur(carte) + "'" +
-		(descEvt ? ' title="' + descEvt + '"' : "") + ">" + carte + "</span>";
+		(descEvt ? ' title="' + descEvt + '" data-aide="evenement" data-nom="' + carte + '" tabindex="0" role="button"' : "") +
+		">" + carte + "</span>";
 	document.getElementById('idRecap').innerHTML += carte + "<br />";
 
 	// Ajouter la carte dans la zone du joueur actif (suite des 4 premières)
@@ -797,7 +835,9 @@ function ajouterCarteAuPanel(carteStr) {
 		var html = '<span class="propa-card-label">💀 Épidémie</span>';
 		if (nomEpidemie) {
 			var descEpi = descriptionsEpidemie[nomEpidemie] || '';
-			html += '<span class="propa-card-epidemic-name" title="' + descEpi + '">' + nomEpidemie + '</span>';
+			html += '<span class="propa-card-epidemic-name" title="' + descEpi + '"' +
+				' data-aide="epidemie" data-nom="' + nomEpidemie + '" tabindex="0" role="button">' +
+				nomEpidemie + '</span>';
 		}
 		el.innerHTML = html;
 		epidemiesCartes.appendChild(el);
@@ -970,7 +1010,7 @@ function partieTerminee(){
 	
 	// On affiche le tableau récapitulatif si d'autres jouerus ont déjà joués cette partie
 	if (pseudos.length >=2) {
-		historiquePartie();
+		afficherHistoriquePartie();
 		document.getElementById('idDebug').checked = true;
 		debug();
 	}
@@ -1117,6 +1157,74 @@ function fermerModal() {
 	if (overlay) overlay.style.display = "none";
 }
 
+/** Enregistre l'écouteur délégué qui ouvre la description d'une carte au clic/tap ou au clavier */
+function initialiserAideCartes() {
+	if (window.aideCartesInitialisee) return;
+	window.aideCartesInitialisee = true;
+
+	document.addEventListener('click', function(e) {
+		var cible = (e.target && e.target.closest) ? e.target.closest('[data-aide]') : null;
+		if (!cible) return;
+		e.preventDefault();
+		afficherAideCarte(cible.getAttribute('data-aide'), cible.getAttribute('data-nom'));
+	});
+
+	document.addEventListener('keydown', function(e) {
+		if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'Spacebar') return;
+		var cible = (e.target && e.target.closest) ? e.target.closest('[data-aide]') : null;
+		if (!cible) return;
+		e.preventDefault();
+		afficherAideCarte(cible.getAttribute('data-aide'), cible.getAttribute('data-nom'));
+	});
+}
+
+/** Affiche dans la modale la description d'une carte (événement, épidémie ou rôle) */
+function afficherAideCarte(type, nom) {
+	if (!nom) return;
+	var prefixe = "";
+	var desc = "";
+	if (type === 'evenement') {
+		prefixe = "🃏 Événement";
+		desc = descriptionsEvenement[nom] || "";
+	}
+	else if (type === 'epidemie') {
+		prefixe = "💀 Épidémie";
+		desc = descriptionsEpidemie[nom] || "";
+	}
+	else if (type === 'role') {
+		prefixe = "👤 Rôle";
+		desc = descriptionsRole[nom] || "";
+	}
+	if (!desc) desc = "Aucune description disponible.";
+	afficherModal(prefixe + " — " + nom, desc);
+}
+
+/** Contenu HTML de la main initiale distribuée (debug) */
+var mainInitialeHtml = "";
+
+/** Mémorise et construit le récap debug des cartes distribuées au départ */
+function construireMainInitiale(main1, main2) {
+	mainInitialeHtml = "";
+	[main1, main2].forEach(function(m, index) {
+		if (!m) return;
+		var cartes = (m.cartes || []).map(function(c) { return escapeHtml(c); }).join(", ");
+		mainInitialeHtml += "J" + (index + 1) + " — " + escapeHtml(m.role) + " : " + cartes + "<br />";
+	});
+	var el = document.getElementById('idMainInitiale');
+	if (el) el.innerHTML = mainInitialeHtml;
+}
+
+/** Affiche / masque la main initiale distribuée (debug) */
+function afficherMainInitiale() {
+	var el = document.getElementById('idMainInitiale');
+	if (!el) return;
+	if (!mainInitialeHtml) {
+		afficherModal("🃏 Main initiale", "Aucune distribution initiale disponible (la partie n'a pas encore démarré).");
+		return;
+	}
+	cacherAfficherCartes('idMainInitiale', 'idLienMainInitiale');
+}
+
 /** Nouvelle partie (avec confirmation via modale) */
 function nouvellePartie() {
 	afficherModal("🔄 Nouvelle partie", "Voulez-vous démarrer une nouvelle partie ?", [
@@ -1247,9 +1355,17 @@ function choixChrono(choix) {
 }
 
 
-/** Rempli le tableau de l'historique des joueurs de la partie */
-function historiquePartie () {
-	cacherAfficherCartes('idSpoilHistoJoueurs', 'idLienSpoilHistoJoueurs');
+/** Construit le tableau de l'historique des joueurs du scénario (sans changer la visibilité) */
+function construireHistoriquePartie () {
+	var el = document.getElementById('idSpoilHistoJoueurs');
+	if (!el) return;
+
+	if (pseudos.length === 0) {
+		el.innerHTML = "<center>Aucun autre joueur n'a encore enregistré de résultat pour ce scénario (idUnique : " +
+			escapeHtml(idUnique) + ").</center>";
+		return;
+	}
+
 	var monTableau = "<center>Si une équipe perd <b>avant le " + MAX_TOURS + "° tour</b> : soit le nombre d'éclosions est à 8, soit il manquait des cubes.<table border='1'> "+
 						"<tr> "+
 						"	<th>Joueurs</th> "+
@@ -1272,5 +1388,27 @@ function historiquePartie () {
 						"<td>" + escapeHtml(tab[5]) + "</td>"+
 					"</tr>";
 	});
-	document.getElementById('idSpoilHistoJoueurs').innerHTML = monTableau + "</table></center>";
+	el.innerHTML = monTableau + "</table></center>";
+}
+
+/** Force l'affichage du tableau de l'historique des joueurs */
+function afficherHistoriquePartie () {
+	construireHistoriquePartie();
+	var el = document.getElementById('idSpoilHistoJoueurs');
+	var lien = document.getElementById('idLienSpoilHistoJoueurs');
+	if (el) el.style.display = "block";
+	if (lien) lien.innerHTML = "Cacher";
+}
+
+/** Affiche / masque le tableau de l'historique des joueurs */
+function historiquePartie () {
+	var el = document.getElementById('idSpoilHistoJoueurs');
+	if (!el) return;
+	if (el.style.display == "block") {
+		el.style.display = "none";
+		var lien = document.getElementById('idLienSpoilHistoJoueurs');
+		if (lien) lien.innerHTML = "Afficher";
+		return;
+	}
+	afficherHistoriquePartie();
 }
