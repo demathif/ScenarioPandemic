@@ -15,12 +15,12 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link rel="icon" href="../images/survival.ico" />
-		<link rel="stylesheet" href="../style/style.css?v=42">
+		<link rel="stylesheet" href="../style/style.css?v=43">
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;700&display=swap" rel="stylesheet" />
-		<script type="text/javascript" src="../assets/cards.js?v=42"></script>
-		<script type="text/javascript" src="../assets/game.js?v=42"></script>
+		<script type="text/javascript" src="../assets/cards.js?v=43"></script>
+		<script type="text/javascript" src="../assets/game.js?v=43"></script>
 	</head>
 	
 	<body onload="run();">
@@ -232,6 +232,9 @@
 				<br />
 				Récap des tours passés : <a id="idLienRecap" onclick="cacherAfficherCartes('idRecap', 'idLienRecap')" href="javascript:void(0);">Montrer</a><br/>
 				<div id="idRecap" style="display: none;"></div>
+
+				Main initiale distribuée (4 cartes par joueur) <a id="idLienMainInitiale" onclick="afficherMainInitiale()" href="javascript:void(0);">Afficher</a><br/>
+				<div id="idMainInitiale" style="display: none;"></div>
 				
 				Spoil, paquet joueur <a id="idLienSpoilPaquetJoueur" onclick="cacherAfficherCartes('idSpoilPaquetJoueur', 'idLienSpoilPaquetJoueur')" href="javascript:void(0);">Montrer</a><br/>
 				<div id="idSpoilPaquetJoueur" style="display: none;"></div>
@@ -239,13 +242,13 @@
 				Spoil, paquet propagation <a id="idLienSpoilPaquetPropagation" onclick="cacherAfficherCartes('idSpoilPaquetPropagation', 'idLienSpoilPaquetPropagation')" href="javascript:void(0);">Montrer</a><br/>
 				<div id="idSpoilPaquetPropagation" style="display: none;"></div>
 				
-				Spoil, historique des joueurs de cette partie <a id="idLienSpoilHistoJoueurs" onclick="historiquePartie()" href="javascript:void(0);">Montrer</a><br/>
+				⚠️ Spoil — Résultats des autres joueurs sur ce scénario (statut, tour, cartes propagation, remèdes, éclosions) <a id="idLienSpoilHistoJoueurs" onclick="historiquePartie()" href="javascript:void(0);">Afficher</a><br/>
 				<div id="idSpoilHistoJoueurs" style="display: none;"></div>
 			</div>
 		</div>
 
 		</div><!-- /idViewJeu -->
 
-		<script type="text/javascript" src="../assets/minuteur.js?v=42"></script>
+		<script type="text/javascript" src="../assets/minuteur.js?v=43"></script>
 	</body>
 </html>
